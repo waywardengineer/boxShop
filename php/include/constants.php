@@ -2,9 +2,9 @@
 if ($authkey!='') {die();};
 
 define("DB_SERVER", "localhost");
-define("DB_USER", "");
+define("DB_USER", "root");
 define("DB_PASS", "");
-define("DB_NAME", "");
+define("DB_NAME", "boxshopalarm");
 define("NEWUSERAUTH", "2348");
 define("HARDCODEDPW", '2348');
 define("TBL_USERS", "users");

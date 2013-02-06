@@ -124,7 +124,7 @@ class MySQLDB
       if(strcasecmp($username, ADMIN_NAME) == 0){
          $ulevel = ADMIN_LEVEL;
       }else{
-         $ulevel = USER_LEVEL;
+         $ulevel = TRUSTED_LEVEL;
       }
 	  
       $q = "INSERT INTO ".TBL_USERS."(username, password, userid, userlevel, email, timestamp) VALUES ('$username', '$password', '0', $ulevel, '$email', $time)";

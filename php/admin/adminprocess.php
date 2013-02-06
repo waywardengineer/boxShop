@@ -1,22 +1,15 @@
 <?php
-/**
- * AdminProcess.php
- * 
- * The AdminProcess class is meant to simplify the task of processing
- * admin submitted forms from the admin center, these deal with
- * member system adjustments.
- *
- * Written by: Jpmaster77 a.k.a. The Grandmaster of C++ (GMC)
- * Last Updated: August 15, 2004
- */
 $authkey='';
-include("../include/user.php");
+date_default_timezone_set('America/Los_Angeles');
 
+include("../include/user.php");
+include("../include/alarm.php");
+$guestcodes = new Guestcodes();
 class AdminProcess
 {
    /* Class constructor */
     public function __construct(){
-      global $user;
+      global $user, $database, $guestcodes;
       /* Make sure administrator is accessing page */
       if(!$user->isAdmin()){
 
@@ -26,16 +19,35 @@ class AdminProcess
 	  if ($_GET['subuser']) {
 		  
 		  $subuser=$_GET['subuser'];
-		  if ($_POST["level$subuser"]){
-			  $level=$_POST["level$subuser"];
-			  if ($level==-1){
-				  $this->procDeleteUser($subuser);
+		  if ($_POST["action$subuser"] == 'level'){
+			  if ($_POST["level$subuser"]){
+				  $level=$_POST["level$subuser"];
+				  if ($level==-1){
+					  $this->procDeleteUser($subuser);
+				  }
+				  else {
+					  $this->procUpdateLevel($subuser, $level);
+				  }
 			  }
-			  else {
-				  $this->procUpdateLevel($subuser, $level);
+		  }
+		  else if ($_POST["action$subuser"] == 'door'){
+			  $keypads = array('K'=>'frontDoor', 'L'=>'machineDoor');
+			  foreach($keypads as $keyPadIndex=>$keyPadName){
+				  if ($_POST["$keyPadName$subuser"]){
+					  $value = "1";
+				  }
+				  else {
+					  $value = "0";
+					  
+				  }
+				  $q = "UPDATE codes SET keyPad$keyPadIndex = $value WHERE UID = $subuser AND startDate = 0;";
+				  //echo $q;		  
+				  $database->query($q);
+				  $guestcodes->doCodeSQLLog($q);
 			  }
-
-}
+      		header("Location: ".$user->referrer);
+			  
+		  }
 	  }
 	  
    }
@@ -57,10 +69,14 @@ class AdminProcess
     * the user is deleted from the database.
     */
    private function procDeleteUser($subuser){
-      global $user, $database;
+      global $user, $database, $guestcodes;
       /* Username error checking */
-         $q = "DELETE FROM ".TBL_USERS." WHERE UID = $subuser LIMIT 1";
+         $q = "DELETE FROM users WHERE UID = $subuser LIMIT 1";
          $database->query($q);
+          $q = "DELETE FROM codes WHERE UID = $subuser;";
+         $database->query($q);
+		$guestcodes->doCodeSQLLog($q);
+
          header("Location: ".$user->referrer);
       
    }

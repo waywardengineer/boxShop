@@ -1,16 +1,24 @@
 <?php
 $authkey='';
+date_default_timezone_set('America/Los_Angeles');
+
 include("include/user.php");
 include("include/alarm.php");
 $guestcodes=new Guestcodes();
 if ($user->isTrusted()){
 	if($_POST['doWhat']=='add'){
-		if($_POST['codeDate']){
-			$codeDate=strtotime($_POST['codeDate']);
-			$form->setValue('codeDate', $_POST['codeDate']);
-			if (!$codeDate){
+		if($_POST['codeStartDate']){
+			$codeStartDate=strtotime($_POST['codeStartDate']);
+			
+			$form->setValue('codeDate', $_POST['codeStartDate']);
+			if (!$codeStartDate){
 				$form->setError("codeDate_err", "* Couldn't make date out of input");	
 			}
+			else {
+				$codeStartDate += $_POST['codeStartTime'] * 3600;
+				$codeEndDate = $codeStartDate + $_POST['codeDuration'] * 3600;
+			}
+
 		}
 		else {
 			$form->setError("codeDate_err", "* No Date Entered");
@@ -19,9 +27,8 @@ if ($user->isTrusted()){
 			$codeCode=$_POST['codeCode'];
 			$form->setValue('codeCode', $codeCode);
 			$output=$guestcodes->validateAndConvert($codeCode, $user->uid);
-			$errDescrips=array(1=>'* The code must be 5 or more digits long', 2=>'* The code must contain only numbers or letters', 3=>'* That code\'s being used by somebody else already');
 			if ($output['err']>0){
-				$form->setError("codeCode_err", $errDescrips[$output['err']]);	
+				$form->setError("codeCode_err", $output['errDescrips']);	
 			}
 			else {
 				$code=$output['code'];
@@ -35,8 +42,10 @@ if ($user->isTrusted()){
 			$form->setValue('codeNotes', $notes);
 		}
 		if($form->num_errors == 0){
-			$q="INSERT INTO codes(UID, codeDate, uses, notes, code) VALUES ('" . $user->uid . "', " . $codeDate . ", 0, '" . @mysql_real_escape_string($notes) . "', '" . $code . "')";
+			$q="INSERT INTO codes(UID,startDate, endDate, notes, code, keyPadK, keyPadL) VALUES ('" . $user->uid . "', " . $codeStartDate . ", " . $codeEndDate . ", '" . @mysql_real_escape_string($notes) . "', '" . $code . "', 1, 0)";
 			$database->query($q);
+			$guestcodes->doCodeSQLLog($q);
+
 		}
 		else {
 			$_SESSION['value_array'] = $_POST;
@@ -63,6 +72,7 @@ if ($user->isTrusted()){
 		if ($hasAuth){
 			$q="DELETE FROM codes WHERE ID=$id LIMIT 1";
 			$database->query($q);
+			$guestcodes->doCodeSQLLog($q);
 		}
 	}
 	header("Location: codes.php");

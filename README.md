@@ -1,4 +1,4 @@
 boxShop
 =======
 
-Boxshop access control and onlinde data management app
+Boxshop access control and online data management app

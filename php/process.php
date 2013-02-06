@@ -1,5 +1,6 @@
 <?php
 $authkey='';
+date_default_timezone_set('America/Los_Angeles');
 
 /**
  * Process.php
@@ -13,6 +14,8 @@ $authkey='';
  * Last Updated: August 19, 2004
  */
 include("include/user.php");
+include("include/alarm.php");
+$guestcodes=new Guestcodes();
 
 class Process
 {
@@ -104,6 +107,7 @@ class Process
       if($retval == 0){
          $_SESSION['reguname'] = $_POST['user'];
          $_SESSION['regsuccess'] = true;
+		 $user->login($_POST['user'], $_POST['pass']);
          header("Location: ".$user->referrer);
       }
       /* Error found with form */
@@ -136,7 +140,7 @@ class Process
       else{
          /* Make sure username is in database */
          $subuser = stripslashes($subuser);
-         if(strlen($subuser) < 5 || strlen($subuser) > 30 ||
+         if(strlen($subuser) < 2 || strlen($subuser) > 30 ||
             !eregi("^([0-9a-z])+$", $subuser) ||
             (!$database->usernameTaken($subuser))){
             $form->setError($field, "* Username does not exist<br>");
@@ -178,20 +182,28 @@ class Process
     * before a change is made.
     */
    function procEditAccount(){
-      global $user, $form;
+	   
+      global $user, $form, $guestcodes;
       /* Account edit attempt */
-      $retval = $user->editAccount($_POST['curpass'], $_POST['newpass'], $_POST['email']);
-
+      $retval = $user->editAccount($_POST['userPass'], $_POST['userNewPass'], $_POST['userEmail']);
+	  if($retval){
+		  $retval = $guestcodes->doCodeUpdate($_POST['userCode'], $user->uid);
+	  }
       /* Account edit successful */
       if($retval){
          $_SESSION['useredit'] = true;
+		 if (isset($_SESSION['regsuccess'])){
+			 $_SESSION['codesuccess'] = true;
+		 }
          header("Location: ".$user->referrer);
+		 
       }
       /* Error found with form */
       else{
          $_SESSION['value_array'] = $_POST;
          $_SESSION['error_array'] = $form->getErrorArray();
-         header("Location: ".$user->referrer);
+         
+		 header("Location: ".$user->referrer);
       }
    }
 };

@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <dwsync>
-<file name="alarm.php" server="ftp.waywardengineer.com/public_html/" local="129685807736828195" remote="129685843200000000" />
-<file name="constants.php" server="ftp.waywardengineer.com/public_html/" local="129685752429904820" remote="129685794000000000" />
-<file name="database.php" server="ftp.waywardengineer.com/public_html/" local="129671029340000000" remote="129685551000000000" />
-<file name="form.php" server="ftp.waywardengineer.com/public_html/" local="129671029330000000" remote="129685551000000000" />
-<file name="mailer.php" server="ftp.waywardengineer.com/public_html/" local="129685771768340915" remote="129685807800000000" />
-<file name="template.php" server="ftp.waywardengineer.com/public_html/" local="129685498466718957" remote="129685551000000000" />
-<file name="user.php" server="ftp.waywardengineer.com/public_html/" local="129685756379720737" remote="129685792200000000" />
-<file name="php5_error_log" server="ftp.waywardengineer.com/public_html/" local="129683931200000000" remote="129685551000000000" />
+<file name="alarm.php" server="ftp.waywardengineer.com/public_html/" local="129685807736828195" remote="129685843200000000" Dst="-1" />
+<file name="constants.php" server="ftp.waywardengineer.com/public_html/" local="129685752429904820" remote="129685794000000000" Dst="-1" />
+<file name="database.php" server="ftp.waywardengineer.com/public_html/" local="129671029340000000" remote="129685551000000000" Dst="-1" />
+<file name="form.php" server="ftp.waywardengineer.com/public_html/" local="129671029330000000" remote="129685551000000000" Dst="-1" />
+<file name="mailer.php" server="ftp.waywardengineer.com/public_html/" local="129685771768340915" remote="129685807800000000" Dst="-1" />
+<file name="template.php" server="ftp.waywardengineer.com/public_html/" local="129685498466718957" remote="129685551000000000" Dst="-1" />
+<file name="user.php" server="ftp.waywardengineer.com/public_html/" local="129685756379720737" remote="129685792200000000" Dst="-1" />
+<file name="alarm.php" server="localhost/alarm/" local="130016330050284298" remote="130016329800000000" Dst="1" />
+<file name="constants.php" server="localhost/alarm/" local="130026293061176285" remote="130014520800000000" Dst="1" />
+<file name="database.php" server="localhost/alarm/" local="130014441092754483" remote="130014520800000000" Dst="1" />
+<file name="form.php" server="localhost/alarm/" local="129671029330000000" remote="130014426600000000" Dst="1" />
+<file name="mailer.php" server="localhost/alarm/" local="129685771770000000" remote="130014426600000000" Dst="1" />
+<file name="template.php" server="localhost/alarm/" local="130026358948144804" remote="130026358800000000" Dst="1" />
+<file name="user.php" server="localhost/alarm/" local="130016061146059767" remote="130016061000000000" Dst="1" />
+<file name="alarm.php" server="ftp.waywardengineer.com/public_html/boxshop/" local="130026593304949246" remote="130026666600000000" Dst="1" />
+<file name="constants.php" server="ftp.waywardengineer.com/public_html/boxshop/" local="130023240999723824" remote="130023312600000000" Dst="1" />
+<file name="database.php" server="ftp.waywardengineer.com/public_html/boxshop/" local="130014441092754483" remote="130016146200000000" Dst="1" />
+<file name="form.php" server="ftp.waywardengineer.com/public_html/boxshop/" local="129671029330000000" remote="130016146200000000" Dst="1" />
+<file name="mailer.php" server="ftp.waywardengineer.com/public_html/boxshop/" local="130027043588063967" remote="130027115400000000" Dst="1" />
+<file name="template.php" server="ftp.waywardengineer.com/public_html/boxshop/" local="130027088823671296" remote="130027160400000000" Dst="1" />
+<file name="user.php" server="ftp.waywardengineer.com/public_html/boxshop/" local="130016061146059767" remote="130016146200000000" Dst="1" />
 </dwsync>

@@ -7,7 +7,7 @@
 #define KPTIMEOUT  (30000)  // If no key is pressed for this many milliseconds, clear the input buffer
 #define KPMAXTRIES 6 // max number of failed tries before timeout happens
 #define KPMAXTRYTIMEINT (30000) //time it takes for 1 failed password attempt to be deducted from the total; the timeout length is 3 times this
-#define KPPASSWORDLEN 5 //number of chars in a password including the #
+
 #define KPNUMPASSWORDS 2 //number of passwords- if i were better at array stuff we probably could ditch this
 #define LATCHDELAY 6000
 /*
@@ -17,17 +17,18 @@
  * by hitting '#', too, to flush the buffer of any password someone was
  * prevriously trying to enter.
  */
-#define NUMALARMSENSEINPUTS 3
 #define HIGHILLUMLEDTIMEOUT 5000
 #define WAITCOUNTDOWNLENGTH 30000
 #define ALARMCODECOUNTDOWNLENGTH 10000 //length of time to flash alarm code after alarm has been turned off
 #define ALARMSTAGE1LENGTH 20000
 #define ALARMSTAGE2LENGTH 75000
-#define KPCODECHECKDELAY 60000
+#define KPCODECHECKDELAY 5000
 #define ALARMWEBPOLLINTERVAL 30000
 #define WEBPOLLINTERVAL 30*60000
-#define SERBUFFERSENDSPACING 5000
-char passwords[][KPPASSWORDLEN] = {{'1','2','3','4','#'}, {'4','3','2','1','#'}};
+#define SERBUFFERSENDSPACING 500
+
+#define KPPASSWORDLEN 5 //number of chars in a password including the #
+char passwords[][KPPASSWORDLEN] = {{'1','2','3','4', '#'}};
 
 #include "Keypad.h"
 
@@ -54,7 +55,7 @@ byte colPins[cols] = {
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, rows, cols);
 
-char kpBuffer[10];
+char kpBuffer[12];
 char key = NO_KEY;
 char kpLastKey = NO_KEY;
 unsigned long upTime = 0;
@@ -68,8 +69,8 @@ byte kpInTimeOut = false;
 int kpBufferLen;
 byte activeTimeOut = false;
 byte alarmStage;
-byte incomingCommandType;
-byte incomingCommand;
+char incomingComponentId = '0';
+char incomingAction = '0';
 
 
 
@@ -98,6 +99,8 @@ const byte iTimerSwitch = 31;
 const byte iExitButton = 32;
 const byte iDoorBell = 33;
 
+#define NUMALARMSENSEINPUTS 3
+
 int alarmInputs[NUMALARMSENSEINPUTS][2] = {{iDoorSwitch, 500}, {iGateSwitch, 1500}, {iBeamSensor, 1500}};
 char alarmInputSerialCodes[NUMALARMSENSEINPUTS][2] = {{'D', '0'}, {'G', '0'}, {'B', '0'}};
 int beepRepeatCount;
@@ -115,6 +118,7 @@ int ledBlinkCount = 0;
 int ledBlink = LOW;
 int beepActiveType;
 String serBuffer = String("");
+String serBuffer1 = String("");
 byte kpGoodPass = false;
 int i;
 int beepTypes[2][4] = {
@@ -134,6 +138,7 @@ int incomingByte;
 
 void setup() {
   Serial.begin(9600);
+  //Serial1.begin(9600);
   pinMode (oAlarmBell,OUTPUT);
   pinMode (oAlarmScreech,OUTPUT);
   pinMode (oHighIllumLed,OUTPUT);
@@ -262,7 +267,7 @@ void loop() {
       alarmStage++;
     }
     if (upTime > webPollTimeOut){
-      serBuffer += String("{M4}");
+      serBuffer += String(".M4");
       webPollTimeOut = upTime + ALARMWEBPOLLINTERVAL;
     }
     if (digitalRead(iOffSwitch) || kpGoodPass){
@@ -311,53 +316,70 @@ void loop() {
     webPollTimeOut = upTime + WEBPOLLINTERVAL;
   }
   kpGoodPass = false;
-  while (Serial.available() > 0) {
+  while (Serial.available() > 0) {// pass messages from usb line to rs485 and decide if it's a message the arduino has to do something about
     // read the incoming byte:
     incomingByte = Serial.read();
-    // say what you got:
     if (incomingByte == '.'){
       serialCharCount = 0;
+      incomingAction = '0';
+      incomingComponentId = '0';
     }
     else if (serialCharCount == 1){
-      incomingCommandType = incomingByte;
+      incomingComponentId = incomingByte;
     }
     else if (serialCharCount == 2){
-      incomingCommand = incomingByte;
-      processCommand();
+      incomingAction = incomingByte;
     }
+    serBuffer1 += incomingByte;
     serialCharCount++;
   }
-  if (serBuffer != String("") && upTime > serBufferTimeOut){
-    Serial.print(serBuffer);
-    serBuffer = String("");
-    serBufferTimeOut = upTime + SERBUFFERSENDSPACING;
+  if (incomingAction != '0'){
+    processCommand();
   }
-    
+  /*while (Serial1.available() > 0) {// pass on messages from rs485 line to usb; for now arduino module doesn't have to do anything about any of these
+    incomingByte = Serial1.read();
+    serBuffer += incomingByte;
+  }*/
+  if (upTime > serBufferTimeOut){
+    if (serBuffer != String("")){
+      serBuffer += String(".");
+      Serial.print(serBuffer);
+      serBuffer = String("");
+      serBufferTimeOut = upTime + SERBUFFERSENDSPACING;
+    }
+    if (serBuffer1 != String("")){
+      //Serial1.print(serBuffer);
+      serBuffer1 = String("");
+      serBufferTimeOut = upTime + SERBUFFERSENDSPACING;
+    }
+  }   
 }
 void processCommand(){
-  switch (incomingCommandType){
+  switch (incomingComponentId){
     case 'D':
-      if (incomingCommand == '1'){
-        kpGoodPass = true;
+      if (incomingAction == '2'){
         kpDoGoodPass();
       }
-      else {
+      else { 
         kpDoBadPass();
-      }
+      }    
+      codeCheckTimeOut = 0;
       break;
     case 'M':
-      if (incomingCommand == '3' && mode == 4){
+      if (incomingAction == '3' && mode == 4){
         changeMode(3);
       }
-      if (incomingCommand == '4'){
+      if (incomingAction == '4'){
         changeMode(4);
       }
       break;    
     case 'R':
-      serBuffer = String("{M") + String(mode) + String("}");
+      serBuffer = String(".M") + String(mode);
       checkSensors(true);
       break;
     }
+    incomingComponentId = '0';
+    incomingAction = '0';    
 }
     
   
@@ -390,12 +412,11 @@ void kpCheckPassword() {
     kpDoGoodPass();
   }
   else if (kpBufferLen > 5){
-    serBuffer += String("{C");
+    serBuffer += String(".K");
     kpBufferLen--;
     for (i=0; i<kpBufferLen; i++){
       serBuffer += String(kpBuffer[i]);
     }
-    serBuffer += String("}");
     codeCheckTimeOut = upTime + KPCODECHECKDELAY;
     activeTimeOut = true;    
       
@@ -410,8 +431,8 @@ void kpDoGoodPass (){
     activeTimeOut = true;
     latchTimeOut = upTime + LATCHDELAY;
     codeCheckTimeOut = 0;
-    serBuffer += String("{K1}");
     doBeep(0);
+    kpGoodPass = true;
 }
 void kpDoBadPass (){
     tone(oBeep, 3000, 500);
@@ -420,7 +441,6 @@ void kpDoBadPass (){
     if (kpFailCount > KPMAXTRIES){
       kpInTimeOut=true;      
     }
-    serBuffer += String("{K2}");
 }
 
 void doBeep(int beepTypeIn){
@@ -473,9 +493,8 @@ int changeMode(int modeIn){
     modeCountDown = ALARMCODECOUNTDOWNLENGTH + upTime;
     break;
   }
-  serBuffer += String("{M");
+  serBuffer += String(".M");
   serBuffer += String(mode);
-  serBuffer += String("}");
 
 }
 int checkSensors(byte reportAll){
@@ -495,14 +514,18 @@ int checkSensors(byte reportAll){
       else {
         thisStatus = '0';
       }
-      if (alarmInputSerialCodes[i][1] != thisStatus || reportAll){
+      if (alarmInputSerialCodes[i][1] != thisStatus) {
         alarmInputSerialCodes[i][1] = thisStatus;
-        serBuffer += String("{");
+        reportAll = true;
+      }
+    }
+    if (reportAll){
+     for (i = 0; i < NUMALARMSENSEINPUTS; i++){     
+        serBuffer += String(".");
         serBuffer += String(alarmInputSerialCodes[i][0]);
         serBuffer += String(alarmInputSerialCodes[i][1]);
-        serBuffer += String("}");
-      } 
-    }
+      }
+    }     
     if (sensorTripped == 0){
       alarmTimeOut = 0;
       return true;

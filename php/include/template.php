@@ -38,10 +38,10 @@ class Template {
 	
 	
 	public function makeGuestCodesList($result){
-		$columnWidths=array(40, 120, 80, 120, 70, 170);
+		$columnWidths=array(40, 120, 80, 120, 170);
 		global $user;
 		$codes=array();
-		$output = '<h3>Your existing codes:</h3>' . $this->makeListRow(array('', 'Username', 'Code', 'Date', 'Used', 'Notes'), $columnWidths, 1);
+		$output = '<h3>Your existing codes:</h3>' . $this->makeListRow(array('', 'Username', 'Code', 'Date', 'Notes'), $columnWidths, 1);
 		while ($row=@mysql_fetch_array($result)){
 			if ($row['UID']==$user->uid){
 				$username='You';
@@ -49,36 +49,51 @@ class Template {
 			else {
 				$username=$row['username'];
 			}
-			$used = $row['uses']?'Yes':'No';
 			$formhtml='<form name="deleteCode" action="proccode.php" method="post"><input type="hidden" name="doWhat" value="delete"><input type="hidden" name="deleteWhat" value="' . $row['ID'] . '"><input type="submit" class="submitbtn" value="X"></form>';
-			$output.= $this->makeListRow(array($formhtml, $username, $row['code'], date('M j, Y', $row['codeDate']), $used, $row['notes']), $columnWidths, 0);
+			$output.= $this->makeListRow(array($formhtml, $username, $row['code'], date('M j, Y', $row['startDate']), $row['notes']), $columnWidths, 0);
 		}
 		$this->values['codes'] = $output;									   
 	}
 	
-	public function makeEventLog($result){
+	public function makeEventLog($result, $isAdmin, $listOnly = false){
 		global $guestcodes;
-		
 		$columnWidths=array(140, 250, 110);
-		$output = '<div class="eventlogbox" id="eventlog_hdr" style="height:15px;" >';
-		$output .=  $this->makeListRow(array('Component', 'Description', 'Time'), $columnWidths, 1, 'eventlog_col', '<div class="eventlog_header">', '</div>');
-		$output .= '</div><div class="eventlogbox" id="eventlog">';
+		$columnTitles=array('Component', 'Description', 'Time');
+		if ($isAdmin){
+			$columnWidths[] = 100;
+			$columnTitles[] = 'User';
+		}
+		if (!$listOnly){
+			$output = '<div class="infobox_header">';
+			$output .=  $this->makeListRow($columnTitles, $columnWidths, 1, 'eventlog_col', '<div>', '</div>');
+			$output .= '</div><div class="infobox_info" id="eventlog">';
+		}
+		else {
+			$output = '';
+		}
 		$today = $guestcodes->startOfToday();
 		$yesterday = $today-(24*3600);
 		while ($row=@mysql_fetch_array($result)){
-			$eventTime = $row['timestamp'] - 3600;
+			$eventTime = $row['timestamp'];
 			if($eventTime >= $today){$time=date('\T\o\d\a\y g:ia', $eventTime);}
 			else if($row['timestamp'] >= $yesterday){$time=date('\Y\e\s\t\e\r\d\a\y g:ia', $eventTime);}
 			else {$time=date('M j g:ia', $eventTime);}
-			$output.=$this->makeListRow(array($row['component'], $row['description'], $time), $columnWidths, 0, 'eventlog_col', '<div class="eventlog_' . $row['type'] . $row['state'] . '">', '</div>');
+			$arr = array($row['component'], $row['description'], $time);
+			if ($isAdmin){
+				$arr[] = $row['username'];
+			}
+			
+			$output.=$this->makeListRow($arr, $columnWidths, 0, 'eventlog_col', '<div class="eventlog_' . $row['type'] . $row['state'] . '">', '</div>');
 		}
-		$output .= '</div>';
+		if (!$listOnly){
+			$output .= '</div>';
+		}
 		$this->values['eventlog'] = $output;									   
 	}
 	public function makeUserList($result) {
-		$columnWidths=array(120, 200, 120, 170);
+		$columnWidths=array(120, 200, 120, 170, 120, 120);
 		$ulevelNames = array(1 =>'New User', 2=>'Trusted', 9=>'Admin');	
-		$output = $this->makeListRow(array('Username', 'Email', 'Last Online', 'User Level'), $columnWidths, 1);
+		$output = $this->makeListRow(array('Username', 'Email', 'Last Online', 'User Level', 'Front Door', 'MachineShop'), $columnWidths, 1);
 		while ($row = @mysql_fetch_array($result, MYSQL_ASSOC)) {
 			$uid = $row["UID"];
 			$ulevel = $row["userlevel"];
@@ -88,8 +103,8 @@ class Template {
 			else{
 				$time=date('M j, Y', $row["timestamp"]);
 			}
-			$output .='<form method="post" action="adminprocess.php?subuser=' . $uid . '" id="adminForm' . $uid . '">';
-			$selecthtml= '<select name="level' . $uid . '" id="level' . $uid . '" onChange=\'changed(' . $uid . ', "' . $row["username"] . '")\'> 
+			$output .='<form method="post" action="adminprocess.php?subuser=' . $uid . '" id="adminForm' . $uid . '"><input type="hidden" name="action' . $uid . '">';
+			$selecthtml= '<select name="level' . $uid . '" id="level' . $uid . '" onChange=\'changeLevel(' . $uid . ', "' . $row["username"] . '")\'> 
 					<option value="1"';
 					if ($ulevel==1) {$selecthtml .= ' selected="selected" class="admin_selected"';}
 					$selecthtml.='>New User</option><option value="2"';
@@ -97,7 +112,24 @@ class Template {
 					$selecthtml .= '>Trusted</option><option value="9"';
 					if ($ulevel==9) {$selecthtml .= ' selected="selected" class="admin_selected"';}
 					$selecthtml .= '>Admin</option><option value="-1">Delete</option></select>';
-			$output .=$this->makeListRow(array($row["username"], $row["email"], $time, $selecthtml), $columnWidths, 0) . '</form>';
+			if ($row['code']){
+				$machineDoorHtml = '<input type="checkbox" name="machineDoor' . $uid . '"';
+				if ($row['keyPadL'] == 1) {
+					$machineDoorHtml .= ' checked="checked"';
+				}
+				$machineDoorHtml .='" onChange=\'changeDoor(' . $uid . ')\'>';
+				$frontDoorHtml = '<input type="checkbox" name="frontDoor' . $uid . '"';
+				if ($row['keyPadK'] == 1) {
+					$frontDoorHtml .= ' checked="checked"';
+				}
+				$frontDoorHtml .='" onChange=\'changeDoor(' . $uid . ')\'>';
+
+			}
+			else {
+				$machineDoorHtml = '';
+				$frontDoorHtml  = '';
+			}
+			$output .=$this->makeListRow(array($row["username"], $row["email"], $time, $selecthtml, $frontDoorHtml, $machineDoorHtml), $columnWidths, 0) . '</form>';
 		}
 		$this->values['users'] = $output;
 	}
@@ -131,7 +163,7 @@ class Template {
 	
 	
 	public function doOutput($showsections) {
-		$sections=array('login', 'page_admin', 'page_admin2', 'page_forgotpass', 'page_login', 'page_codes', 'page_index', 'regform', 'calscripts');
+		$sections=array('trusted', 'login', 'page_admin', 'page_admin2', 'page_forgotpass', 'page_login', 'page_codes', 'page_edit', 'page_index', 'page_index2', 'regform', 'regcodeform', 'calscripts');
 		foreach($sections as $section){//hide sections we won't use
 			if (!in_array($section, $showsections)){
 				$matchstring='/{' . $section . '.*\/' . $section . '}/s';
@@ -157,6 +189,43 @@ class Template {
 			$output.='<div class="' . $class . '" style="width:' . $widths[$k] . 'px">' . $headingtag . $col . $headingclosetag .  '</div>';
 		}
 		$output=$before . $output . $after;
+		return $output;
+	}
+	public function makeBarGraph($values, $maxHeight, $labelSkip, $title){
+		$totalWidth=800;
+		$spacing=1;
+		$totalHeight=180;
+		$labelCount = 1;
+		$barWidth=intval($totalWidth/count($values))-$spacing;
+		$output='<div class="infobox_header"><strong>' . $title . '</strong></div><div class="infobox_info">';
+		$left=25;
+		$sideWaysTxtLimit = 30;
+		if ($barWidth < $sideWaysTxtLimit){
+			$textClass = 'barGraphBarSideways';
+		}
+		else {
+			$textClass = 'barGraphBar';
+		}
+		$labelOffset = -23 + intval($barWidth/2);
+		
+		foreach($values as $value){
+			$height = intval(($totalHeight * $value[1])/$maxHeight);
+			$top = $totalHeight - $height + 15;
+			if ($value[1] > 0 && (($height > 20 and $barWidth > $sideWaysTxtLimit) or $height > 40)){
+				$text = $value[1];
+			}
+			else {
+				$text = '&nbsp;';
+			}
+			$output .= '<div class="' . $textClass . '" style="height:' . $height . 'px; width:' . $barWidth . 'px; top:' . $top . 'px; left:' . $left . 'px"><span>' . $text . '</span></div>';
+			if ($labelCount == 1){
+				$output .= '<span class="barGraphLabel" style="left:' . ($left+$labelOffset) . 'px;">' . $value[0] . '</span>';
+			}
+			$labelCount = ($labelCount >= $labelSkip)?1:$labelCount + 1;
+			$left += ($barWidth + $spacing);
+
+		}
+		$output .= '</div>';
 		return $output;
 	}
 	

@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <dwsync>
-<file name="main.tpl" server="ftp.waywardengineer.com/public_html/" local="129685498300519451" remote="129685551000000000" />
+<file name="main.tpl" server="ftp.waywardengineer.com/public_html/" local="129685498300519451" remote="129685551000000000" Dst="-1" />
+<file name="eventlog.tpl" server="localhost/alarm/" local="129687378090000000" remote="130014426600000000" Dst="1" />
+<file name="main.tpl" server="localhost/alarm/" local="130026301755263558" remote="130026301800000000" Dst="1" />
+<file name="eventlog.tpl" server="ftp.waywardengineer.com/public_html/boxshop/" local="129687378090000000" remote="130016146800000000" Dst="1" />
+<file name="main.tpl" server="ftp.waywardengineer.com/public_html/boxshop/" local="130026628210000000" remote="130026700200000000" Dst="1" />
 </dwsync>

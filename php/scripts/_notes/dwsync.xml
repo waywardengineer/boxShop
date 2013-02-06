@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <dwsync>
-<file name="builder.js" server="ftp.waywardengineer.com/public_html/" local="129367830856092351" remote="129670325400000000" />
-<file name="calendarview.js" server="ftp.waywardengineer.com/public_html/" local="129367867010320255" remote="129670325400000000" />
-<file name="controls.js" server="ftp.waywardengineer.com/public_html/" local="129367830856432371" remote="129670325400000000" />
-<file name="dragdrop.js" server="ftp.waywardengineer.com/public_html/" local="129367830856722387" remote="129670325400000000" />
-<file name="effects.js" server="ftp.waywardengineer.com/public_html/" local="129367830856992403" remote="129670325400000000" />
-<file name="prototype.js" server="ftp.waywardengineer.com/public_html/" local="129367855620758809" remote="129670325400000000" />
-<file name="rollover.js" server="ftp.waywardengineer.com/public_html/" local="129367830857192414" remote="129670325400000000" />
-<file name="scriptaculous.js" server="ftp.waywardengineer.com/public_html/" local="129367830857502432" remote="129670325400000000" />
-<file name="slider.js" server="ftp.waywardengineer.com/public_html/" local="129367830857662441" remote="129670325400000000" />
-<file name="sound.js" server="ftp.waywardengineer.com/public_html/" local="129367830857922456" remote="129670325400000000" />
-<file name="unittest.js" server="ftp.waywardengineer.com/public_html/" local="129367830858152469" remote="129670325400000000" />
+<file name="jquery-ui-1.8.16.custom.min.js" server="localhost/alarm/" local="129685868400000000" remote="130014426600000000" Dst="1" />
+<file name="jquery.js" server="localhost/alarm/" local="129685846550000000" remote="130014426600000000" Dst="1" />
+<file name="jquery-ui-1.8.16.custom.min.js" server="ftp.waywardengineer.com/public_html/boxshop/" local="129685868400000000" remote="130016146800000000" Dst="1" />
+<file name="jquery.js" server="ftp.waywardengineer.com/public_html/boxshop/" local="129685846550000000" remote="130016146800000000" Dst="1" />
 </dwsync>

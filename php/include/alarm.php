@@ -23,13 +23,25 @@ class Alarm {
 	}
 	public function doStatusLog() {//called mostly by the alarm api to parse and log any changes in the status
 		global $database;
-		$inputVars = array('M', 'D', 'G', 'B', 'W', 'K');
+		$inputVars = array('M', 'D', 'E', 'G', 'H', 'B', 'W');
+		$keyPadCodes = array('D'=>'K', 'E'=>'L');
 		foreach ($inputVars as $i => $value){
 			if (!is_null($_GET[$value])){
-				$q="SELECT ID, timestamp, state FROM alarmevents WHERE componentID = '$value' ORDER BY timestamp DESC LIMIT 1;";	
+				$q="SELECT ID, timestamp, state FROM alarmevents WHERE componentID = '$value' ORDER BY timestamp DESC LIMIT 1;";
 				$row=@mysql_fetch_array($database->query($q));
 				if ($_GET[$value] != $row['state']){
-					$q="INSERT INTO alarmevents(componentID, state, timestamp, UID) VALUES ('$value', $_GET[$value], " . time() . ", -1);";
+					$uid = -1;
+					$extra = '';
+					if ($value == 'D' or $value =='E'){
+						if ($_GET['U'] > 0){
+							$uid = $_GET['U'];
+						}
+						if ($_GET[$keyPadCodes[$value]]){
+							$extra .= $_GET[$keyPadCodes[$value]];
+						}
+					}
+						
+					$q="INSERT INTO alarmevents(componentID, state, timestamp, UID, extra) VALUES ('$value', $_GET[$value], " . time() . ", $uid, '$extra');";
 					$database->query($q);
 				}
 			}
@@ -48,46 +60,15 @@ class Alarm {
 				}
 			}
 		}
+		$q = "DELETE FROM codes WHERE startDate > 0 AND endDate < " . time() . ';';
+		$database->query($q);
 	}
 }
 class Guestcodes {
-	public function doCodeCheckAndLog($code){//called by the alarm api to log codes entered at the keypad
-		global $database;
-		$goodcode = 0;
-		$q="SELECT ID, UID, code, firstused FROM codes WHERE codeDate = " . $this->startOfToday() . ";";
-		$codeToCheck = str_split($code);
-		$result = $database->query($q);
-		$row=@mysql_fetch_array($result);
-		while ($row['code'] && $goodcode == 0){	
-			$codeToCheckAgainst = str_split($row['code']);
-			$passcharcount = 0;
-    		$i=0;
-    		while($i < count($codeToCheck)) {
-      			if ($codeToCheckAgainst[$passcharcount] == $codeToCheck[$i]) {//matched this character, go to next one
-        			$passcharcount++;
-    			}
- 	     		$i++;
-  			}
-	    	if ($passcharcount == count($codeToCheckAgainst)){
-	      		$goodcode = 1;
-	      		$code = $row['code'];
-				if ($result['firstused']){
-					$q="UPDATE codes SET uses=uses+1 WHERE ID=" . $row['ID'] . ";";
-				}
-				else {
-					$q="UPDATE codes  SET uses=uses+1, firstused=" . time() . " WHERE ID=" . $row['ID'] . ";";
-				}
-				$database->query($q);
-				$uid=$row['UID'];
-			}
-			$row=@mysql_fetch_array($result);
-		}
-		$q="INSERT INTO alarmevents(componentID, state, timestamp, extra, UID) VALUES ('K', $goodcode, " . time() . ", $code, $uid);";
-		$database->query($q);
-		return $goodcode;
-	}
 	public function validateAndConvert($codein, $uid=null){//validates codes, both from users entering new temporary ones and from the alarm api to make sure they're numbers
 		global $database;
+		$errDescrips=array(0=>'', 1=>'* The code must be 5 or more digits long', 2=>'* The code must contain only numbers or letters', 3=>'* That code\'s being used by somebody else already', 4=>'* That code is too easy to guess and is not allowed');
+
 		$num=array('a'=>'2', 'b'=>'2', 'c'=>'2', 'd'=>'3', 'e'=>'3', 'f'=>'3', 'g'=>'4', 'h'=>'4', 'i'=>'4', 'j'=>'5', 'k'=>'5', 'l'=>'5', 'm'=>'6', 'n'=>'6', 'o'=>'6', 'p'=>'7', 'q'=>'7', 'r'=>'7', 's'=>'7', 't'=>'8', 'u'=>'8', 'w'=>'8', 'x'=>'9', 'y'=>'9', 'z'=>'9');
 		$len=strlen($codein);
 		$err=0;
@@ -114,17 +95,67 @@ class Guestcodes {
 		}
 		$code=$output;
 		if ($uid){
-			$q="SELECT ID FROM codes WHERE code=$code AND codeDate >= " . $this->startOfToday() . " AND UID != $uid;";
+			$q="SELECT ID FROM codes WHERE code=$code AND UID != $uid;";
 			$result=$database->query($q);
 			if (@mysql_fetch_array($result)){
 				$err=3;
 			}
 		}
-		return array('err'=>$err, 'code'=>$output);
+		$q="SELECT ID FROM prohibitedcodes WHERE code=$code;";
+		$result=$database->query($q);
+		if (@mysql_fetch_array($result)){
+			$err=4;
+		}
+		
+		return array('err'=>$err, 'code'=>$output, 'errDescrip'=>$errDescrips[$err]);
 	}
 	public function startOfToday(){		
-		$now=time() - 3600;
+		$now=time();
 		return mktime(0,0,0, date(m,$now),date(d,$now), date(Y,$now));
 	}
+	public function doCodeUpdate($codein, $uid=null){
+		global $database, $form;
+		$q = "SELECT ID, code FROM codes WHERE UID = $uid AND startDate = 0";
+		$result = $database->query($q);
+		$row = @mysql_fetch_array($result);
+		if ($row){
+			if ($row['code'] == $codein){
+				return 1;
+			}
+			else {
+				$mode = 1;
+			}
+		}
+		else {
+			$mode = 2;
+		}
+		if ($mode){
+			$codeResult = $this->validateAndConvert($codein, $uid);
+			if ($codeResult['err'] > 0){
+				$form->setError('userCode', $codeResult['errDescrip']);
+				return 0;
+			}
+			else {
+				if ($mode == 1){
+					$q = "UPDATE codes SET code = '" . $codeResult['code'] . "' WHERE ID = " . $row['ID'] . ';';
+				}
+				else {
+					$q = "INSERT INTO codes (UID, startDate, notes, code, keypadK, keypadL) VALUES ($uid, 0, '', '" . $codeResult['code'] . "', 1, 0);";
+				}
+			}
+			$database->query($q);
+			$this->doCodeSQLLog($q);
+			return 1;
+		}
+				
+	}
+	public function doCodeSQLLog($query){
+		global $database;
+		$q = 'INSERT INTO codesyncsql (query, done) VALUES ("' . htmlentities($query) . '", 0);';
+		$database->query($q);
+	}
+		
+		
+	
 
 }

@@ -335,7 +335,7 @@ class userclass{
       /* New password entered */
       if($subnewpass){
          /* Current Password error checking */
-         $field = "curpass";  //Use field name for current password
+         $field = "userPass";  //Use field name for current password
          if(!$subcurpass){
             $form->setError($field, "* Current Password not entered");
          }
@@ -353,7 +353,7 @@ class userclass{
          }
          
          /* New Password error checking */
-         $field = "newpass";  //Use field name for new password
+         $field = "userNewPass";  //Use field name for new password
          /* Spruce up password and check length*/
          $subpass = stripslashes($subnewpass);
          if(strlen($subnewpass) < 4){
@@ -367,12 +367,12 @@ class userclass{
       /* Change password attempted */
       else if($subcurpass){
          /* New Password error reporting */
-         $field = "newpass";  //Use field name for new password
+         $field = "userNewPass";  //Use field name for new password
          $form->setError($field, "* New Password not entered");
       }
       
       /* Email error checking */
-      $field = "email";  //Use field name for email
+      $field = "userEmail";  //Use field name for email
       if($subemail && strlen($subemail = trim($subemail)) > 0){
          /* Check if valid email address */
          $regex = "^[_+a-z0-9-]+(\.[_+a-z0-9-]+)*"

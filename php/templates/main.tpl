@@ -13,39 +13,43 @@
 <script type="text/javascript" src="{dir}scripts/jquery-ui-1.8.16.custom.min.js"></script>
 <script type="text/javascript">
 	$(function() {
-		$( "#codeDate" ).datepicker();
+		$( "#codeStartDate" ).datepicker();
 	});
 </script>
 {/calscripts}
 
 <script type="text/javascript">
-	  function showEventLog(){
-	  	if ($('#eventlogcontainer').css('height') == "0px"){
-	  		$('#eventlogcontainer').css('display', 'block');
-	  		$('#eventlogcontainer').animate({
-	  			height: 220
-	  		});
-	  		$('#eventlogcontainer').load('eventlog.php');
+	  function changeInfoView(){
+		 pageName = $('#infoView').val() + '.php';
+	  	$('#eventlogcontainer').load(pageName);
 
-	  	}
-	  	else {
-	  		$('#eventlogcontainer').animate({
-	  			height: 0
-	  		});
-	  		$('#eventlogcontainer').empty();
-	  		$('#eventlogcontainer').css('display', 'none');
-	  	}
 	   	
-	  }	   
+	  }	
+	  
+	  function getRandomCode(){
+		$.get("randomcode.php",
+		function(data){
+			$('#codeCode').val(data.code);
+		}, "json");
+   	  }
+   
 </script>
 
 {page_admin}
 	<script type="text/javascript">
-        function changed(uid, username){
+        function changeLevel(uid, username){
             var formname = 'adminForm' + uid;
             var theform=document.forms[formname];
-            var fieldname = 'level' + uid;
+
+
+            var fieldname = 'action' + uid;
+            theform.elements[fieldname].value = "level";
+
+            fieldname = 'level' + uid;
             var thefield=theform.elements[fieldname].value; 
+
+
+
             var strings = [];
             strings[-1]="Really delete " + username + '?';
             strings[1]="Really demote " + username + ' to a "new user"?';
@@ -60,6 +64,18 @@
                 theform.submit();
             }
         }
+
+        function changeDoor(uid){
+            var formname = 'adminForm' + uid;
+            var theform=document.forms[formname];
+
+
+            var fieldname = 'action' + uid;
+            theform.elements[fieldname].value = "door";
+            theform.submit();
+        }
+
+
     </script>
 {/page_admin}
 </head>
@@ -72,9 +88,10 @@
 
     {/admin}
 	{trusted}
-    {button1}	
-    <div id = "eventlogcontainer" style="display:none">
-    
+	
+    <div id = "eventlogcontainer">
+     {bargraph}
+   
     </div>
     {/trusted}
 
@@ -93,59 +110,57 @@
 {/page_admin2}
 {page_codes}
     <div class="addpass">
-        <h3>Make a door password for a guest</h3>
-        <p>Create a temporary password for a guest. Password is good for 2 hours after someone enters it for the first time</p>
+        <h3>Make a temporary door password for a guest</h3>
+             <p>Codes must be at least 5 digits long. You can enter numbers or letters corresponding to a phone keypad.</p>
             <form action="proccode.php" method="post">
             	<input type="hidden" name="doWhat" value="add" />
-            	{codeDate_err}
+            	{codeStartDate_err}
             	<div class="formRow">
-
                     <div style="position:absolute; top:5px; left:25px;">Date:</div>
+                    <input name="codeStartDate" id="codeStartDate" maxlength="30" class="formfield" type="text" value="{codeStartDate}" style="position:absolute; top:5px; left:65px;">
+ 
+				</div> 
+            	<div class="formRow">
+                    <div style="position:absolute; top:5px; left:-10px;">Starting at:</div>
+ 
+                  <select name="codeStartTime" id="codeStartTime" class="formfield" style="position:absolute; top:5px; left:65px;">
+                    <option value="6">6AM</option>
+                    <option value="10" selected="selected">10AM</option>
+                    <option value="14">2PM</option>
+                    <option value="18">6PM</option>
+                    <option value="22">10PM</option>
+                  </select>
 
-                    <input name="codeDate" id="codeDate" maxlength="30" class="formfield" type="text" value="{codeDate}" style="position:absolute; top:5px; left:65px;">
-
-	                
-
+                     <div style="position:absolute; top:5px; left:142px;">Lasting for:</div>
+ 
+                  <select name="codeDuration" id="codeDuration" class="formfield" style="position:absolute; top:5px; left:218px;">
+                    <option value="2">2 hours</option>
+                    <option value="4" selected="selected">4 hours</option>
+                    <option value="6">6 hours</option>
+                    <option value="8">8 hours</option>
+                    <option value="12">12 hours</option>
+                  </select>
                 </div>
-
                 {codeCode_err}
-
             	<div class="formRow">
-
                     <div style="position:absolute; top:5px; left:21px;">Code:</div>
-
-                    <input name="codeCode" maxlength="30" class="formfield" type="text" value="{codeCode}" style="position:absolute; top:5px; left:65px;">
-
-                    <div style="position:absolute; top:5px; left:225px;">Numbers or phone keypad letters, no # at end, minimum 5 characters</div>
+                    <input id="codeCode" name="codeCode" maxlength="30" class="formfield" type="text" value="{codeCode}" style="position:absolute; top:5px; left:65px;">
+                    <input name="Button" type="button" class="submitbtn" style="position: absolute; top: -2px; left: 221px;" value="Make Random Code" onclick="getRandomCode()">
 
                 </div>
-
             	<div class="formRow">
-
-                    <div style="position:absolute; top:5px; left:21px;">Notes:</div>
-
+                    <div style="position:absolute; top:5px; left:20px;">Notes:</div>
                     <input name="codeNotes" maxlength="100" class="formfield" type="text" value="{codeNotes}" style="position:absolute; top:5px; left:65px;">
-
                 </div>
-
             	<div class="formRow">
-
                     <input value="Add Temp Code" class="submitbtn" type="submit" style="position:absolute; top:5px; left:65px;">
-
 				</div>
-
             </form>
-
         {codes}
-
     </div>
-
 {/page_codes}
-
 {page_register}
-
     <div class="addpass">
-
         {regmsg}
 
         {regform}
@@ -203,7 +218,28 @@
         </form>
 
         {/regform}
+		{regcodeform}
+        <form action="process.php" method="post">
+            <input type="hidden" name="subedit" value="1">
+             {form_userCode_err}
+             <p>Codes must be at least 5 digits long. You can enter numbers or letters corresponding to a phone keypad.</p>
+            <div class="formRow">
+                <div style="position:absolute; top:6px; left:0px; width:190px; text-align:right">Doorcode:</div>
+                <input id="codeCode" name="userCode" maxlength="30" class="formfield" type="text" value="{form_userCode}" style="position:absolute; top:5px; left:200px;">
+                <input name="Button" type="button" class="submitbtn" style="position: absolute; top: -2px; left: 370px;" value="Make Random Code" onclick="getRandomCode()">
 
+            </div>
+            <div class="formRow">
+                <input value="Update" class="submitbtn" type="submit" style="position:absolute; top:5px; left:200px;">
+            </div>
+
+
+
+
+		</form>       
+        
+        
+        {/regcodeform}
     </div>
 
 
@@ -212,10 +248,74 @@
 
 {/page_register}
 
+
+
+{page_edit}
+
+    <div class="addpass">
+    	{editmsg}
+        
+        {editform}
+                     <p>Doorcodes must be at least 5 digits long. You can enter numbers or letters corresponding to a phone keypad.</p>
+
+        <form action="process.php" method="post">
+            <input type="hidden" name="subedit" value="1">
+            {form_userPass_err}
+            <div class="formRow">
+                <div style="position:absolute; top:6px; left:0px; width:190px; text-align:right">Password:</div>
+                <input name="userPass" maxlength="30" class="formfield" type="password" value="{form_userPass}" style="position:absolute; top:5px; left:200px;">
+            </div>
+            {form_userNewPass_err}
+
+            <div class="formRow">
+                <div style="position:absolute; top:6px; left:0px; width:190px; text-align:right">New Password:</div>
+                <input name="userNewPass" maxlength="30" class="formfield" type="password" value="{form_userNewPass}" style="position:absolute; top:5px; left:200px;">
+            </div>
+
+
+            {form_userCode_err}
+            <div class="formRow">
+                <div style="position:absolute; top:6px; left:0px; width:190px; text-align:right">Doorcode:</div>
+                <input id="codeCode" name="userCode" maxlength="30" class="formfield" type="text" value="{form_userCode}" style="position:absolute; top:5px; left:200px;">
+                <input name="Button" type="button" class="submitbtn" style="position: absolute; top: -2px; left: 370px;" value="Make Random Code" onclick="getRandomCode()">
+
+            </div>
+            {form_userEmail_err}
+            <div class="formRow">
+                <div style="position:absolute; top:6px; left:0px; width:190px; text-align:right">Email:</div>
+                <input name="userEmail" maxlength="50" class="formfield" type="text" value="{form_userEmail}" style="position:absolute; top:5px; left:200px;">
+           </div>
+            <div class="formRow">
+                <input value="Update" class="submitbtn" type="submit" style="position:absolute; top:5px; left:200px;">
+            </div>
+       </form>
+        {/editform}
+    </div>
+
+
+{/page_edit}
+
+
+
+
+
+
+
 <div class="bottombar">
 
 	{bottomlinks}
-
+	{page_index2}
+    <label for="infoView">Information to view:</label>
+    <select name="infoView" id="infoView" onchange="changeInfoView()">
+      <option value="daygraph">Last 24 Hours</option>
+      <option value="weekgraph" selected="selected">Last Week</option>
+      <option value="yeargraph">Last Year</option>
+      <option value="eventlog">Event Log</option>
+    </select>
+    <script>
+		changeInfoView();
+    </script>
+	{/page_index2}
     {login}
 
         <form action="process.php" method="POST">

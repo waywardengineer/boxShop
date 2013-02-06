@@ -1,6 +1,5 @@
 <?php
 $authkey='';
-date_default_timezone_set('America/Los_Angeles');
 include("include/user.php");
 include("include/template.php");
 include("include/alarm.php");
@@ -25,7 +24,6 @@ else {
 
 $alarmstatus=$alarm->getstatus();
 if($user->isTrusted()){
-	$showsections[] = 'page_index2';
 	if ($_POST['actionType']){
 		$actionType = (int) $_POST['actionType'];
 		$expiration = time() + 5*60;
@@ -35,6 +33,7 @@ if($user->isTrusted()){
 	$guestcodes = new Guestcodes();
 	$toplink['Temporary Doorcodes'] = 'codes.php';
 	$toplink['My Account'] = 'edit.php';
+	$bottomlink['Event log'] = 'JS:showEventLog()';
 	$showsections[]='trusted';
 	if($user->isAdmin()){
 		$showsections[]='admin';
@@ -52,15 +51,25 @@ if($user->isTrusted()){
 		$row=@mysql_fetch_array($database->query($q));
 		$html->makeButton($row['state'], 2);
 	}
+
 	
 	
 }
 
 
 
-
-
-
+$currentTimeInterval = time() - 24*3600;
+$doorCounts = array();
+for ($i=0; $i<24; $i++){
+	$timeIntervalEnd = $currentTimeInterval + 3600;
+	$q="SELECT COUNT(ID) AS total FROM alarmevents WHERE timestamp > $currentTimeInterval AND timestamp <= $timeIntervalEnd AND componentID = 'D' AND state = 1";
+	$row=@mysql_fetch_array($database->query($q));
+	
+	$doorCounts[] = array(date('g:ia', $currentTimeInterval), $row['total']);
+	$currentTimeInterval = $timeIntervalEnd;
+}
+$html->set('bargraph', $html->makeBarGraph($doorCounts, 10, 4, 'Yard door openings over the last 24 hours'));		
+	
 $html->makestatus($alarmstatus, $user->logged_in);
 $html->makeLinkBars($toplink, 'toplinks');
 $html->makeLinkBars($bottomlink, 'bottomlinks');
