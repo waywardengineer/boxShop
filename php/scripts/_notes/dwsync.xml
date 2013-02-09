@@ -4,4 +4,11 @@
 <file name="jquery.js" server="localhost/alarm/" local="129685846550000000" remote="130014426600000000" Dst="1" />
 <file name="jquery-ui-1.8.16.custom.min.js" server="ftp.waywardengineer.com/public_html/boxshop/" local="129685868400000000" remote="130016146800000000" Dst="1" />
 <file name="jquery.js" server="ftp.waywardengineer.com/public_html/boxshop/" local="129685846550000000" remote="130016146800000000" Dst="1" />
+<file name="calendarview.js" server="localhost/boxshop/" local="129422204336824110" remote="130046087400000000" Dst="1" />
+<file name="homefunctions.js" server="localhost/boxshop/" local="129430043982112490" remote="130046087400000000" Dst="1" />
+<file name="calfunctions.js" server="localhost/boxshop/" local="130048620948321094" remote="130048620600000000" Dst="1" />
+<file name="jquery-ui-1.8.16.custom.min.js" server="localhost/boxshop/" local="129685868400000000" remote="130046087400000000" Dst="1" />
+<file name="jquery.js" server="localhost/boxshop/" local="129685846550000000" remote="130046087400000000" Dst="1" />
+<file name="jquery.validate.additional-methods.js" server="localhost/boxshop/" local="129126778340000000" remote="130048620600000000" Dst="1" />
+<file name="jquery.validate.min.js" server="localhost/boxshop/" local="129126778340000000" remote="130048620600000000" Dst="1" />
 </dwsync>

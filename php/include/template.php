@@ -1,59 +1,44 @@
 <?php
-if ($authkey!='') {die();};
+if ($auth!='auth') {die();};
 
 class Template {
-	private $values = array();
+	protected $values = array();
 	
-    public function __construct($file) {
+    public function __construct($file, $subTemplateFile = false) {
 		$this->file=$file;
 		if (!file_exists($this->file)) {
 	        return "Error loading template file ($this->file).<br />";
 		}
+		if ($subTemplateFile && !file_exists($subTemplateFile)) {
+	        return "Error loading template file ($subTemplateFile).<br />";
+		}
 		$this->output = file_get_contents($this->file);
+		if ($subTemplateFile){
+			$subTemplate = file_get_contents($subTemplateFile);
+			$subTemplateSections = array('scripts', 'content');
+			foreach($subTemplateSections as $sectionName){
+				$reResults = array();
+				$reString = '/({' . $sectionName . '})(.*)({\/' . $sectionName . '})/s';
+				preg_match($reString, $subTemplate, $reResults);
+				//$this->values[$sectionName] = $reResults[2];
+				$matchstring = '{' . $sectionName . '}';
+				$this->output = str_replace($matchstring, $reResults[2], $this->output);
+
+			}
+
+		}
+			
     }
-		
-		
 	public function set($key, $value) {
 		$this->values[$key] = $value;
 	}
-	
-	
-	
-	public function makeLinkBars($links, $value){
-		$output='';
-		if ($links){
-			foreach ($links as $linkname => $link){
-				if (substr($link,0,3)=='JS:'){
-					$href='href="#" onClick="' . substr($link,3) .'"';
-				}
-				else {
-					$href='href="' . $link .'"';
-				}
-				$output.='<a ' . $href .' class="toplinks">' . $linkname . '</a>';
-			}
+	public function setMulti($array){
+		foreach($array as $k=>$v){
+			$this->set($k, $v);
 		}
-		$this->values[$value] = $output;
 	}
 	
 	
-	
-	public function makeGuestCodesList($result){
-		$columnWidths=array(40, 120, 80, 120, 170);
-		global $user;
-		$codes=array();
-		$output = '<h3>Your existing codes:</h3>' . $this->makeListRow(array('', 'Username', 'Code', 'Date', 'Notes'), $columnWidths, 1);
-		while ($row=@mysql_fetch_array($result)){
-			if ($row['UID']==$user->uid){
-				$username='You';
-			}
-			else {
-				$username=$row['username'];
-			}
-			$formhtml='<form name="deleteCode" action="proccode.php" method="post"><input type="hidden" name="doWhat" value="delete"><input type="hidden" name="deleteWhat" value="' . $row['ID'] . '"><input type="submit" class="submitbtn" value="X"></form>';
-			$output.= $this->makeListRow(array($formhtml, $username, $row['code'], date('M j, Y', $row['startDate']), $row['notes']), $columnWidths, 0);
-		}
-		$this->values['codes'] = $output;									   
-	}
 	
 	public function makeEventLog($result, $isAdmin, $listOnly = false){
 		global $guestcodes;
@@ -88,7 +73,7 @@ class Template {
 		if (!$listOnly){
 			$output .= '</div>';
 		}
-		$this->values['eventlog'] = $output;									   
+		return $output;									   
 	}
 	public function makeUserList($result) {
 		$columnWidths=array(120, 200, 120, 170, 120, 120);
@@ -109,7 +94,9 @@ class Template {
 					if ($ulevel==1) {$selecthtml .= ' selected="selected" class="admin_selected"';}
 					$selecthtml.='>New User</option><option value="2"';
 					if ($ulevel==2) {$selecthtml .= ' selected="selected" class="admin_selected"';}
-					$selecthtml .= '>Trusted</option><option value="9"';
+					$selecthtml .= '>Trusted</option><option value="3"';
+					if ($ulevel==3) {$selecthtml .= ' selected="selected" class="admin_selected"';}
+					$selecthtml .='>Group</option><option value="9"';
 					if ($ulevel==9) {$selecthtml .= ' selected="selected" class="admin_selected"';}
 					$selecthtml .= '>Admin</option><option value="-1">Delete</option></select>';
 			if ($row['code']){
@@ -162,28 +149,36 @@ class Template {
 	}
 	
 	
-	public function doOutput($showsections) {
-		$sections=array('trusted', 'login', 'page_admin', 'page_admin2', 'page_forgotpass', 'page_login', 'page_codes', 'page_edit', 'page_index', 'page_index2', 'regform', 'regcodeform', 'calscripts');
-		foreach($sections as $section){//hide sections we won't use
-			if (!in_array($section, $showsections)){
-				$matchstring='/{' . $section . '.*\/' . $section . '}/s';
-				$this->output=preg_replace($matchstring,'',$this->output);
+	public function doOutput($showSections = array()) {
+		$reResults = array();
+		while(preg_match('/{\/(.*)}/', $this->output, $reResults)){
+			if (!in_array($reResults[1], $showSections)){
+				$matchstring='/{' . $reResults[1] . '.*\/' . $reResults[1] . '}/s';
 			}
+			else {
+				$matchstring='#{/' . $reResults[1] . '}#';
+			}
+			$this->output=preg_replace($matchstring,'',$this->output);
+
 		}
 		foreach ($this->values as $key => $value) {
 			$matchstring = '{' . $key . '}';
 			$this->output = str_replace($matchstring, $value, $this->output);
 		}
-		$this->output=preg_replace('/{.*}/','',$this->output);
+		$this->output=preg_replace('/{[A-Za-z]*}/','',$this->output);
 		return $this->output;
 	}
+		
 	
-	
-	private function makeListRow($cols, $widths, $isHeading, $class="listcolumn", $before="<p>", $after="</p>"){
+	public function makeListRow($cols, $widths, $isHeading, $class="listcolumn", $before="<p>", $after="</p>"){
 		$output='';
 		if ($isHeading){
 			$headingtag='<strong>';
 			$headingclosetag='</strong>';
+		}
+		else {
+			$headingtag='';
+			$headingclosetag='';
 		}
 		foreach($cols as $k=>$col){
 			$output.='<div class="' . $class . '" style="width:' . $widths[$k] . 'px">' . $headingtag . $col . $headingclosetag .  '</div>';
@@ -228,6 +223,100 @@ class Template {
 		$output .= '</div>';
 		return $output;
 	}
+	function makeNav($array, $secondLevel = false){
+		$output = $secondLevel?'<ul>':'<ul id="nav">';
+		foreach($array as $k=>$v){
+			$output .='<li>';
+			if (is_array($v)){
+				$output .= '<a href="' . reset($v) . '">' . $k . '</a>' . $this->makeNav($v, true);
+			}
+			else {
+				$output .= '<a href="' . $v . '">' . $k . '</a>';
+			}
+			$output .='</li>';
+		}
+		$output .= '</ul>';
+		return $output;
+	}
+				
+	public function makeTable($data, $caption = false, $hasColHeadings = true, $hasRowHeadings = true, $id = false){
+
+		$output = "<table";
+		$output .= $id?" id = '$id'>":'>';
+		$output .=  $caption?"<caption>$caption</caption>":'';
+			
+		foreach($data as $rowIndex=>$row){
+			if ($rowIndex == 0 && $hasColHeadings){
+				$output .= '<thead><tr>';
+				foreach($row as $colIndex=>$col){
+					if ($colIndex == 0 && $hasRowHeadings){
+						$output .= '<td></td>';
+					}
+					else {
+						$output .= "<th scope='col'>$col</th>";
+					}
+				}
+			}
+			else{
+				if ($rowIndex == 0 && !$hasColHeadings){
+					$output .= '<tbody>';
+				}
+				if ($rowIndex == 1 && $hasColHeadings){			
+					$output .= '</thead><tbody>';
+				}
+				$output .= '<tr>';
+				foreach($row as $colIndex=>$col){
+					if ($colIndex == 0 && $hasRowHeadings){
+						$output .= "<th scope='row'>$col</th>";
+					}
+					else {
+						$output .= "<td>$col</td>";
+					}
+				}
+			}
+			$output .='</tr>';
+		}
+		$output .='</tbody></table>';
+
+		return $output;
+	}
+	public function makeFormOptions($array){
+		$output = '';
+		foreach($array as $k=>$v){
+			$output .= '<option value="' . $k;
+			$output .= '">' . $v . '</option>';
+		}
+		return $output;
+	}
+	function createNav(){
+		global $user, $database;
+		$navItems = array();
+		if ($user->logged_in){
+			if ($user->isTrusted()){
+				$navItems['Door Codes'] = 'codes.php';
+				$navItems['CNC logs'] = 'cnc.php';
+				$navItems['Shop Supplies Management'] = array('Supplies Management'=>'supplies.php', 'Logs'=>'supplieslog.php');
+				$navItems['Wiki'] = array();
+				$navItems['Event Calendar'] = 'calendar.php';
+				$navItems['Door Logs'] = array('Event Log'=>'logs.php?log=event', '24 hr graph'=>'logs.php?log=day', 'Week graph'=>'logs.php?log=week', 'Year graph'=>'logs.php?log=year');
+				$result = $database->query('SELECT DISTINCT page_name FROM wiki_sections');
+				while ($row = @mysql_fetch_array($result)){
+					$navItems['Wiki'][$row['page_name']] = 'wiki.php?l=' . $row['page_name'];
+				}
+				$navItems['Wiki']['New Page'] = "addwikipage.php";
+			}
+			if ($user->isAdmin()){
+				$navItems['Admin'] = 'admin.php';
+			}
+			$navItems['logout'] = 'process.php';
+		}
+		else {
+			$navItems['register'] = 'register.php';
+		}
+		$this->set("nav", $this->makeNav($navItems));
+	return;
+	}
+
 	
 }
 ?>

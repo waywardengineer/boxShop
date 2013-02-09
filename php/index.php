@@ -1,69 +1,61 @@
 <?php
-$authkey='';
-date_default_timezone_set('America/Los_Angeles');
-include("include/user.php");
-include("include/template.php");
+$auth='auth';
+include("include/common.php");
 include("include/alarm.php");
-$showsections = array('page_index');
-$html = new Template('templates/main.tpl');
 $alarm = new Alarm();
-
-
-
 if($user->logged_in){
+	$html = new Template('templates/main.tpl', 'templates/front.tpl');
 	$welcome_msg = "Welcome, $user->username";
-	$toplink['Logout'] = 'process.php';
 }
 else {
+	$html = new Template('templates/main.tpl');
 	$welcome_msg="Hello, guest";
-	$html->set('form_login_user', $form->value("user"));
-	$html->set('form_login_user_err', $form->error("user"));
-	$html->set('form_login_pass', $form->value("pass"));
-	$html->set('form_login_pass_err', $form->error("pass"));
+	$html->set('formLoginUser', $form->value("user"));
+	$html->set('formLoginUserError', $form->error("user"));
+	$html->set('formLoginPass', $form->value("pass"));
+	$html->set('formLoginPassError', $form->error("pass"));
 	$showsections[]='login';
 }
+$html->createNav();
 
-$alarmstatus=$alarm->getstatus();
+$alarmStatus=$alarm->getstatus();
+$alarmStatusDescriptions = array(1 => 'Not Armed', 2 => 'Armed', 3 => 'Waiting to Arm', 4 => 'Alarm',  5 => 'Resetting from alarm', 6 => 'Unable to connect to alarm');
+
 if($user->isTrusted()){
-	$showsections[] = 'page_index2';
-	if ($_POST['actionType']){
+	if (isset($_POST['actionType'])){
 		$actionType = (int) $_POST['actionType'];
 		$expiration = time() + 5*60;
 		$q = "UPDATE pendingactions SET state = 1, expiration = $expiration WHERE ID = $actionType";
 		$database->query($q);
 	}
 	$guestcodes = new Guestcodes();
-	$toplink['Temporary Doorcodes'] = 'codes.php';
-	$toplink['My Account'] = 'edit.php';
 	$showsections[]='trusted';
-	if($user->isAdmin()){
-		$showsections[]='admin';
-		$toplink['Admin']= 'admin/admin.php';
-	}
 	$alarm->clearExpiredActions();
 
-	if ($alarmstatus < 6){ //make buzz door button if communication
+	if ($alarmStatus < 6){ //make buzz door button if communication
 		$q="SELECT state FROM pendingactions WHERE ID = 1";
 		$row=@mysql_fetch_array($database->query($q));	
 		$html->makeButton($row['state'], 1);
 	}
-	if ($alarmstatus == 4){ // make stop alarm button if in alarm mode
+	if ($alarmStatus == 4){ // make stop alarm button if in alarm mode
 		$q="SELECT state FROM pendingactions WHERE ID = 2";
 		$row=@mysql_fetch_array($database->query($q));
 		$html->makeButton($row['state'], 2);
 	}
-	
+	$html->set('alarmstatus', $alarmStatusDescriptions[$alarmStatus]);
+	$result = $database->query("SELECT item FROM supplies_items WHERE needednow = 1");
+	$arr = array();
+	while ($row = @mysql_fetch_array($result)){
+		$arr[] = '-' .$row['item'];
+		
+	}
+	$html->set('itemsneeded', implode('<br> ', $arr));
+		
+		
 	
 }
 
 
-
-
-
-
-$html->makestatus($alarmstatus, $user->logged_in);
-$html->makeLinkBars($toplink, 'toplinks');
-$html->makeLinkBars($bottomlink, 'bottomlinks');
 $html->set('welcome', $welcome_msg);
 echo $html->doOutput($showsections);
 

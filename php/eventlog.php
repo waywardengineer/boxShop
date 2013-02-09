@@ -1,5 +1,5 @@
 <?php
-$authkey='';
+$auth='';
 date_default_timezone_set('America/Los_Angeles');
 
 include("include/user.php");

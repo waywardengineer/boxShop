@@ -1,5 +1,5 @@
 <?php
-$authkey='';
+$auth='';
 include("include/user.php");
 include("include/template.php");
 if (!$user->isTrusted()){

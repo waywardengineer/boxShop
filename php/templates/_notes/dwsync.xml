@@ -5,4 +5,27 @@
 <file name="main.tpl" server="localhost/alarm/" local="130026301755263558" remote="130026301800000000" Dst="1" />
 <file name="eventlog.tpl" server="ftp.waywardengineer.com/public_html/boxshop/" local="129687378090000000" remote="130016146800000000" Dst="1" />
 <file name="main.tpl" server="ftp.waywardengineer.com/public_html/boxshop/" local="130026628210000000" remote="130026700200000000" Dst="1" />
+<file name="cal_editmulti.tpl" server="localhost/boxshop/" local="130048646584147380" remote="130048646400000000" Dst="1" />
+<file name="cal_editsingle.tpl" server="localhost/boxshop/" local="130048695487554495" remote="130048695000000000" Dst="1" />
+<file name="editbody.tpl" server="localhost/boxshop/" local="129431889301116670" remote="130046087400000000" Dst="1" />
+<file name="eventlog.tpl" server="localhost/boxshop/" local="129687378090000000" remote="130046087400000000" Dst="1" />
+<file name="historybody.tpl" server="localhost/boxshop/" local="129427527843827420" remote="130046087400000000" Dst="1" />
+<file name="home.tpl" server="localhost/boxshop/" local="129428444603402410" remote="130046087400000000" Dst="1" />
+<file name="main.tpl" server="localhost/boxshop/" local="130048813708306335" remote="130048813800000000" Dst="1" />
+<file name="nav.tpl" server="localhost/boxshop/" local="129428407398626490" remote="130046087400000000" Dst="1" />
+<file name="page.tpl" server="localhost/boxshop/" local="129433396973274120" remote="130046087400000000" Dst="1" />
+<file name="wikiEditSection.tpl" server="localhost/boxshop/" local="130046651101339320" remote="130046650800000000" Dst="1" />
+<file name="wikiSection.tpl" server="localhost/boxshop/" local="130046585459107408" remote="130046585400000000" Dst="1" />
+<file name="editaccount.tpl" server="localhost/boxshop/" local="130048744488167169" remote="130048750200000000" Dst="1" />
+<file name="register.tpl" server="localhost/boxshop/" local="130048750197963751" remote="130048750200000000" Dst="1" />
+<file name="wikiHistory.tpl" server="localhost/boxshop/" local="130046637414168993" remote="130046637000000000" Dst="1" />
+<file name="codes.tpl" server="localhost/boxshop/" local="130048747995277765" remote="130048750200000000" Dst="1" />
+<file name="cnc.tpl" server="localhost/boxshop/" local="130048589470720679" remote="130048589400000000" Dst="1" />
+<file name="wikiAddPage.tpl" server="localhost/boxshop/" local="130047138805663500" remote="130047134400000000" Dst="1" />
+<file name="supplies.tpl" server="localhost/boxshop/" local="130048592849893956" remote="130048593000000000" Dst="1" />
+<file name="supplieslog.tpl" server="localhost/boxshop/" local="130048789993019898" remote="130048789800000000" Dst="1" />
+<file name="calendar.tpl" server="localhost/boxshop/" local="130048695053209651" remote="130048695000000000" Dst="1" />
+<file name="admin.tpl" server="localhost/boxshop/" local="130048722167650509" remote="130048722000000000" Dst="1" />
+<file name="front.tpl" server="localhost/boxshop/" local="130048766289974161" remote="130048766400000000" Dst="1" />
+<file name="forgotpass.tpl" server="localhost/boxshop/" local="130048816929370569" remote="130048816800000000" Dst="1" />
 </dwsync>

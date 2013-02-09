@@ -1,5 +1,5 @@
 <?php
-$authkey='';
+$auth='auth';
 date_default_timezone_set('America/Los_Angeles');
 
 /**
@@ -148,7 +148,7 @@ class Process
       }
       
       /* Errors exist, have user correct them */
-      if($form->num_errors > 0){
+      if($form->numErrors > 0){
          $_SESSION['value_array'] = $_POST;
          $_SESSION['error_array'] = $form->getErrorArray();
       }
@@ -186,15 +186,9 @@ class Process
       global $user, $form, $guestcodes;
       /* Account edit attempt */
       $retval = $user->editAccount($_POST['userPass'], $_POST['userNewPass'], $_POST['userEmail']);
-	  if($retval){
-		  $retval = $guestcodes->doCodeUpdate($_POST['userCode'], $user->uid);
-	  }
       /* Account edit successful */
       if($retval){
          $_SESSION['useredit'] = true;
-		 if (isset($_SESSION['regsuccess'])){
-			 $_SESSION['codesuccess'] = true;
-		 }
          header("Location: ".$user->referrer);
 		 
       }

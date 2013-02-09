@@ -1,18 +1,19 @@
 <?php
-$authkey='';
+$auth='auth';
 date_default_timezone_set('America/Los_Angeles');
 
 include("include/user.php");
 include("include/alarm.php");
 $guestcodes=new Guestcodes();
 if ($user->isTrusted()){
-	if($_POST['doWhat']=='add'){
+	if($_POST['doWhat']=='addTemp'){
+
 		if($_POST['codeStartDate']){
 			$codeStartDate=strtotime($_POST['codeStartDate']);
 			
 			$form->setValue('codeDate', $_POST['codeStartDate']);
 			if (!$codeStartDate){
-				$form->setError("codeDate_err", "* Couldn't make date out of input");	
+				$form->setError("codeDateError", "* Couldn't make date out of input");	
 			}
 			else {
 				$codeStartDate += $_POST['codeStartTime'] * 3600;
@@ -21,27 +22,31 @@ if ($user->isTrusted()){
 
 		}
 		else {
-			$form->setError("codeDate_err", "* No Date Entered");
+			$form->setError("codeDateError", "* No Date Entered");
 		}
+
 		if($_POST['codeCode']){
 			$codeCode=$_POST['codeCode'];
 			$form->setValue('codeCode', $codeCode);
 			$output=$guestcodes->validateAndConvert($codeCode, $user->uid);
 			if ($output['err']>0){
-				$form->setError("codeCode_err", $output['errDescrips']);	
+				$form->setError("codeCodeError", $output['errDescrips']);	
 			}
 			else {
 				$code=$output['code'];
 			}
 		}
 		else {
-			$form->setError("codeCode_err", "* No Code Entered");
+			$form->setError("codeCodeError", "* No Code Entered");
 		}
+
 		if ($_POST['codeNotes']){
 			$notes= htmlentities($_POST['codeNotes']);
 			$form->setValue('codeNotes', $notes);
 		}
-		if($form->num_errors == 0){
+		if($form->numErrors == 0){
+
+		
 			$q="INSERT INTO codes(UID,startDate, endDate, notes, code, keyPadK, keyPadL) VALUES ('" . $user->uid . "', " . $codeStartDate . ", " . $codeEndDate . ", '" . @mysql_real_escape_string($notes) . "', '" . $code . "', 1, 0)";
 			$database->query($q);
 			$guestcodes->doCodeSQLLog($q);
@@ -75,7 +80,32 @@ if ($user->isTrusted()){
 			$guestcodes->doCodeSQLLog($q);
 		}
 	}
-	header("Location: codes.php");
+	else if ($_POST['doWhat']=='changePerm'){
+		if($_POST['permCode']){
+			$permCode=$_POST['permCode'];
+			$form->setValue('permCode', $permCode);
+			$output=$guestcodes->validateAndConvert($permCode, $user->uid);
+			if ($output['err']>0){
+				$form->setError("permCodeError", $output['errDescrips']);	
+			}
+			else {
+				$code=$output['code'];
+			}
+		}
+		else {
+			$form->setError("permCodeError", "* No Code Entered");
+		}
+		if($form->numErrors == 0){
+			$guestcodes->doCodeUpdate($permCode, $user->uid);
+			$_SESSION['codesuccess'] = true;
+		}
+		else {
+			$_SESSION['value_array'] = $_POST;
+			$_SESSION['error_array'] = $form->getErrorArray();
+		}
+	}
+
+	header("Location: {$user->referrer}");
 }
 else {
 	header("Location: index.php");

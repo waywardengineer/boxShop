@@ -1,10 +1,11 @@
 <?php
 date_default_timezone_set('America/Los_Angeles');
-$authkey='';
+$auth='auth';
 include("include/user.php");
 include("include/template.php");
-$showsections=array('page_register');
-$html = new Template('templates/main.tpl');
+$html = new Template('templates/main.tpl', 'templates/register.tpl');
+$html->createNav();
+$showsections = array();
 if($user->logged_in and !isset($_SESSION['regsuccess'])){
 	header("Location: index.php");
 	exit();
@@ -22,14 +23,14 @@ else if(isset($_SESSION['regsuccess'])){
 	   else {
 		$showsections[] = 'regcodeform';
 
-		  if ($form->num_errors == 0){
+		  if ($form->numErrors == 0){
 			   $regmsg='<h1>Registered!</h1>
 			  <p>Thanks <strong> ' .$_SESSION['reguname']. '</strong>, you are now logged in. You can now choose a door code.</p>';
 		  }
 		  else {
 			   $regmsg='<p><strong>Oops</strong>, there\'s a problem with that code</p>';
-				$html->set('form_userCode', $form->value('userCode'));
-				$html->set('form_userCode_err', $form->error('userCode'));
+				$html->set('formUserCode', $form->value('userCode'));
+				$html->set('formUserCodeErr', $form->error('userCode'));
 			  
 		  }
 	   }
@@ -53,21 +54,20 @@ else if(isset($_SESSION['regsuccess'])){
 else{
 	$showsections[]='regform';
 	$regmsg='<h1>Register</h1>';
-	if($form->num_errors > 0){
-	   $regmsg .= '<p>' .$form->num_errors.' error(s) found</p>';
+	if($form->numErrors > 0){
+	   $regmsg .= '<p>' .$form->numErrors.' error(s) found</p>';
 	}
-	$html->set('form_reg_user', $form->value("user"));
-	$html->set('form_reg_user_err', $form->error("user"));
-	$html->set('form_reg_pass', $form->value("pass"));
-	$html->set('form_reg_pass_err', $form->error("pass"));
-	$html->set('form_reg_email', $form->value("email"));
-	$html->set('form_reg_email_err', $form->error("email"));
-	$html->set('form_reg_auth', $form->value("auth"));
-	$html->set('form_reg_auth_err', $form->error("auth"));
+	$html->set('formRegUser', $form->value("user"));
+	$html->set('formRegUserError', $form->error("user"));
+	$html->set('formRegPass', $form->value("pass"));
+	$html->set('formRegPassError', $form->error("pass"));
+	$html->set('formRegEmail', $form->value("email"));
+	$html->set('formRegEmailError', $form->error("email"));
+	$html->set('formRegAuth', $form->value("auth"));
+	$html->set('formRegAuthError', $form->error("auth"));
 }
 
 
-$html->makeLinkBars(array('Home'=>'index.php'), 'toplinks');
 $html->set('welcome', $welcome_msg);
 $html->set('regmsg', $regmsg);
 echo $html->doOutput($showsections);

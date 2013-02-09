@@ -1,12 +1,11 @@
 <?php
-if ($authkey!='') {die();};
+if ($auth!='auth') {die();};
 
 define("DB_SERVER", "localhost");
-define("DB_USER", "root");
+define("DB_USER", "");
 define("DB_PASS", "");
-define("DB_NAME", "boxshopalarm");
+define("DB_NAME", "boxshop");
 define("NEWUSERAUTH", "2348");
-define("HARDCODEDPW", '2348');
 define("TBL_USERS", "users");
 define("ADMIN_NAME", "admin");
 define("GUEST_NAME", "Guest");

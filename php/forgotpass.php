@@ -1,10 +1,8 @@
 <?php
-$authkey='';
-include("include/user.php");
-include("include/template.php");
-$html = new Template('templates/main.tpl');
-$toplink['Home']= 'index.php';
-$showsections = array('page_forgotpass');
+$auth='auth';
+include("include/common.php");
+$html = new Template('templates/main.tpl', 'templates/forgotpass.tpl');
+$html->createNav();
 if(isset($_SESSION['forgotpass'])){
    /**
     * New password was generated for user and sent to user's
@@ -23,13 +21,13 @@ if(isset($_SESSION['forgotpass'])){
    unset($_SESSION['forgotpass']);
 }
 else{
+	echo 'fucker';
 	$msg="<p><strong>Forgot Password</strong></p><p>A new password will be generated for you and sent to the email address associated with your account, all you have to do is enter your username.</p>";
 	$msg.= $form->error("user");
-	$html->set('form_user', $form->value("user"));
+	$html->set('formUser', $form->value("user"));
 }
-$html->makeLinkBars($toplink, 'toplinks');
-$html->set('msg', $msg);
-echo $html->doOutput($showsections);
+$html->set('forgotpassmsg', $msg);
+echo $html->doOutput();
 
 ?>
 

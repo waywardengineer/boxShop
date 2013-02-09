@@ -1,5 +1,5 @@
 <?php 
-if ($authkey!='') {die();};
+if ($auth!='auth') {die();};
 
 /**
  * Mailer.php

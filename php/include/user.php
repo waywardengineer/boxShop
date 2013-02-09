@@ -2,7 +2,7 @@
 // need to modify this to mostly be structured around user id like the other stuff
 
 
-if ($authkey!='') {die();};
+if ($auth!='auth') {die();};
 include("database.php");
 include("mailer.php");
 include("form.php");
@@ -143,7 +143,7 @@ class userclass{
       }
       
       /* Return if form errors exist */
-      if($form->num_errors > 0){
+      if($form->numErrors > 0){
          return false;
       }
 
@@ -162,7 +162,7 @@ class userclass{
       }
       
       /* Return if form errors exist */
-      if($form->num_errors > 0){
+      if($form->numErrors > 0){
          return false;
       }
 
@@ -213,7 +213,9 @@ class userclass{
       /* Unset PHP session variables */
       unset($_SESSION['username']);
       unset($_SESSION['userid']);
-
+	unset($_SESSION['regsuccess']);
+	unset($_SESSION['codesuccess']);
+	
       /* Reflect fact that user has logged out */
       $this->logged_in = false;
       
@@ -307,7 +309,7 @@ class userclass{
       }
 
       /* Errors exist, have user correct them */
-      if($form->num_errors > 0){
+      if($form->numErrors > 0){
          return 1;  //Errors with form
       }
       /* No errors, add the new account to the */
@@ -385,7 +387,7 @@ class userclass{
       }
       
       /* Errors exist, have user correct them */
-      if($form->num_errors > 0){
+      if($form->numErrors > 0){
          return false;  //Errors with form
       }
       

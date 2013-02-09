@@ -1,6 +1,6 @@
 <?php
 
-$authkey='';
+$auth='auth';
 include("include/database.php");
 include("include/alarm.php");
 $guestcodes = new Guestcodes();

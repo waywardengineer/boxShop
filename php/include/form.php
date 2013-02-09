@@ -1,5 +1,5 @@
 <?php 
-if ($authkey!='') {die();};
+if ($auth!='auth') {die();};
 
 /**
  * Form.php
@@ -16,7 +16,7 @@ class Form
 {
    var $values = array();  //Holds submitted form field values
    var $errors = array();  //Holds submitted form error messages
-   var $num_errors;   //The number of errors in submitted form
+   var $numErrors;   //The number of errors in submitted form
 
    /* Class constructor */
    function Form(){
@@ -27,13 +27,13 @@ class Form
       if(isset($_SESSION['value_array']) && isset($_SESSION['error_array'])){
          $this->values = $_SESSION['value_array'];
          $this->errors = $_SESSION['error_array'];
-         $this->num_errors = count($this->errors);
+         $this->numErrors = count($this->errors);
 
          unset($_SESSION['value_array']);
          unset($_SESSION['error_array']);
       }
       else{
-         $this->num_errors = 0;
+         $this->numErrors = 0;
       }
    }
 
@@ -51,7 +51,7 @@ class Form
     */
    function setError($field, $errmsg){
       $this->errors[$field] = $errmsg;
-      $this->num_errors = count($this->errors);
+      $this->numErrors = count($this->errors);
    }
 
    /**

@@ -1,5 +1,5 @@
 <?php
-if ($authkey!='') {die();};
+if ($auth!='auth') {die();};
 
 class Alarm {
 	public function getstatus(){//see what the database says the status is, and if it hasn't been updated in awhile, set the status to the "connection failed" state
@@ -111,7 +111,7 @@ class Guestcodes {
 	}
 	public function startOfToday(){		
 		$now=time();
-		return mktime(0,0,0, date(m,$now),date(d,$now), date(Y,$now));
+		return mktime(0,0,0, date('m',$now),date('d',$now), date('Y',$now));
 	}
 	public function doCodeUpdate($codein, $uid=null){
 		global $database, $form;
@@ -154,6 +154,37 @@ class Guestcodes {
 		$q = 'INSERT INTO codesyncsql (query, done) VALUES ("' . htmlentities($query) . '", 0);';
 		$database->query($q);
 	}
+	public function getGuestCodes($uid){
+		global $database;
+		$q="SELECT codes.ID, codes.UID, codes.startDate, codes.notes, codes.code, users.username FROM codes INNER JOIN users ON codes.UID = users.UID WHERE codes.UID = " .  $uid . " AND codes.endDate >= " . $this->startOfToday() . " ORDER BY codes.startDate ASC;";
+		$result=$database->query($q);
+		return $result;
+	}
+	public function getPermCodes($uid){
+		global $database;
+		$output = array('code'=>'No code Set', 'accessZones'=>array());
+		$zoneNames = array('keyPadK'=>'Front Door', 'keyPadL'=>'CNC', 'keyPadM'=>'Machineshop');
+		$q="SELECT code, keyPadK, keyPadL, keyPadM FROM codes WHERE UID = " .  $uid . " AND codes.startDate = 0";
+		$result=$database->query($q);
+		$row=@mysql_fetch_array($result);
+		if ($row){
+			$output['code'] = $row['code'];
+			$accessZones = array();
+			foreach($zoneNames as $k=>$v){
+				if($row[$k] == 1){
+					$accessZones[] = $zoneNames[$k];
+				}
+			}
+			$output['accessZones'] = $accessZones;
+		}
+		return $output;
+	}
+				
+			
+			
+		
+		
+
 		
 		
 	

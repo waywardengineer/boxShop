@@ -1,35 +1,23 @@
 <?php
 
-$authkey='';
-date_default_timezone_set('America/Los_Angeles');
+$auth='auth';
+include("include/common.php");
+$html = new Template('templates/main.tpl');
+$html->createNav();
 
-include("include/user.php");
-include("include/template.php");
 include("include/alarm.php");
+include("include/templateAddons.php");
+print_r($form);
 if (!$user->isTrusted()){
 	header("Location: index.php");
 	die();
 }
-$html = new Template('templates/main.tpl');
+$subTemplate = new codesTemplate('templates/codes.tpl');
 $alarm = new Alarm();
 $guestCodes=new Guestcodes();
 $welcome_msg = "Welcome, $user->username";
-$showsections = array('page_codes', 'calscripts', 'page_admin2');
-$q="SELECT codes.ID, codes.UID, codes.startDate, codes.notes, codes.code, users.username FROM codes INNER JOIN users ON codes.UID = users.UID WHERE codes.UID = " .  $user->uid . " AND codes.endDate >= " . $guestCodes->startOfToday() . " ORDER BY codes.startDate ASC;";
-$result=$database->query($q);
-if(mysql_num_rows($result)){
-	$html->makeGuestCodesList($result);
-}
-$toplink['Home'] = 'index.php';
-if($user->isAdmin()){
-	$toplink['Admin']= 'admin/admin.php';
-}
-$html->set('codeCode', $form->value("codeCode"));
-$html->set('codeCode_err', $form->error("codeCode_err"));
-$html->set('codeDate', $form->value("codeDate"));
-$html->set('codeDate_err', $form->error("codeDate_err"));
-$html->set('codeNotes', $form->value("codeNotes"));
-$toplink['Logout'] = 'process.php';
-$html->makeLinkBars($toplink, 'toplinks');
-$html->set('welcome', $welcome_msg);
-echo $html->doOutput($showsections);
+$subTemplate->setMulti(array('codeCode'=> $form->value("codeCode"), 'codeCodeError'=>$form->error("codeCodeError"), 'codeDate'=>$form->value("codeDate"), 'codeDateError'=>$form->error("codeDateError"), 'codeNotes'=>$form->value("codeNotes")));
+$subTemplate->makePermCodesList($guestCodes->getPermCodes($user->uid));
+$subTemplate->makeGuestCodesList($guestCodes->getGuestCodes($user->uid));
+$html->setMulti(array('msg' => $welcome_msg, 'content' => $subTemplate->doOutput()));
+echo $html->doOutput(array('codescripts'));

@@ -21,4 +21,13 @@
 <file name="mailer.php" server="ftp.waywardengineer.com/public_html/boxshop/" local="130027043588063967" remote="130027115400000000" Dst="1" />
 <file name="template.php" server="ftp.waywardengineer.com/public_html/boxshop/" local="130027088823671296" remote="130027160400000000" Dst="1" />
 <file name="user.php" server="ftp.waywardengineer.com/public_html/boxshop/" local="130016061146059767" remote="130016146200000000" Dst="1" />
+<file name="alarm.php" server="localhost/boxshop/" local="130046718185407582" remote="130046718000000000" Dst="1" />
+<file name="constants.php" server="localhost/boxshop/" local="130046094657159138" remote="130047072600000000" Dst="1" />
+<file name="database.php" server="localhost/boxshop/" local="130048744484546962" remote="130048750200000000" Dst="1" />
+<file name="form.php" server="localhost/boxshop/" local="130048746153992449" remote="130048750200000000" Dst="1" />
+<file name="mailer.php" server="localhost/boxshop/" local="130027043580000000" remote="130046087400000000" Dst="1" />
+<file name="template.php" server="localhost/boxshop/" local="130048721632129879" remote="130048721400000000" Dst="1" />
+<file name="user.php" server="localhost/boxshop/" local="130048747992867627" remote="130048750200000000" Dst="1" />
+<file name="common.php" server="localhost/boxshop/" local="130047538934409556" remote="130047542400000000" Dst="1" />
+<file name="templateAddons.php" server="localhost/boxshop/" local="130047633076584180" remote="130047633000000000" Dst="1" />
 </dwsync>
