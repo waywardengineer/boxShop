@@ -1,7 +1,7 @@
 import serial
 import urllib
 import sys
-import Skype4Py
+from twilio.rest import TwilioRestClient 
 import MySQLdb
 import re
 import calendar
@@ -9,7 +9,6 @@ import time
 import wx
 ID_START = wx.NewId()
 
-			
 class Frame(wx.Frame):
 	def __init__(self, title):
 		wx.Frame.__init__(self, None, title=title, size=(850,300))
@@ -72,17 +71,12 @@ class Frame(wx.Frame):
 		if connected and query:
 			try:
 				self.dbc.execute(query)
-
 				result = True
 			except Exception as inst:
 				self.m_status.AppendText('failed executing query\n')
 				self.m_status.AppendText(str(query) + '\n')
 		return result			
-		
-				
 
-			
-			
 	def OnAlarm(self, event):
 		self.btnEvent = 2
 	def mysqlConnect(self):
@@ -94,25 +88,25 @@ class Frame(wx.Frame):
 			self.db = False
 			self.dbConnectTryTime = calendar.timegm(time.localtime()) + 60
 			self.m_status.AppendText('failed in connecting to database\n')
-			print (inst)							
 	def handleSerial(self):
 		self.RUN_SERIAL = 1
 		self.btnEvent = 0
 		codeUpdateAcknowledgmentMaxTries = 6
 		ser = serial.Serial(2, 9600, timeout=0.1)
 		outputs = {'M': '0', 'D': '0', 'E': '0', 'G': '0', 'H': '0', 'B': '0', 'W': '0', 'K': '0', 'L': '0', 'U': '0'}
-		phoneNumbers = ['+14155551234', '+14155551234', '+14155551234', '+14155551234']
+		phoneNumbers = ['+14155555555', '+14155555555', '+14155555555', '+14155555555']
 		keyPadIndexes = {'K': 'D', 'L': 'E'}
-		btnEventSerCodes = ['', '.D1', '.M4']
+		btnEventSerCodes = ['', '.D2', '.M4']
 		btnEventDescripts = ['', 'Buzzing front door', 'Setting alarm mode']
-		webRoot = "http://www.waywardengineer.com/boxshop/"
+		webRoot = ""
 		callTimeOut = 0
-		startedSkype = 0
 		codeToValidate = ''
 		codeLocation = 0
 		self.mysqlConnect()
-			
-		while self.RUN_SERIAL:
+		twilioAccountSid = "" 
+		twilioAuthToken = "" 
+		twilioClient = TwilioRestClient(twilioAccountSid, twilioAuthToken)
+ 		while self.RUN_SERIAL:
 			value = ser.readline().decode('utf-8')
 			if value:
 				match = False
@@ -144,18 +138,19 @@ class Frame(wx.Frame):
 						else:
 							responseCode = "3"
 					else:
-						responseCode = "3"							
+						responseCode = "3"
 					outputs[keyPadIndexes[codeLocation]] = responseCode
 					serString = "." + keyPadIndexes[codeLocation] + responseCode
 					ser.write(serString)
 					ser.write(".")
-					codeToValidate =''	
+					codeToValidate =''
 				url = webRoot + "alarmapi.php?"
 				for k, v in outputs.items():
 					url += str(k) + '=' + str(v) + '&'
 					if (k != 'M'):
 						outputs[k] = '0'
 				self.m_status.AppendText(url + '\n')
+				webResult = False
 				try:
 					webPage = urllib.urlopen(url)
 					webResult = webPage.read()
@@ -167,7 +162,10 @@ class Frame(wx.Frame):
 				except Exception as inst:
 					self.m_status.AppendText("Got an error contacting the web " + time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime()) + '\n')
 					time.sleep(1)
-				result = re.match("INSERT|DELETE|UPDATE", webResult)
+				if (webResult):
+					result = re.match("INSERT|DELETE|UPDATE", webResult)
+				else:
+					result = False
 				if result:
 					rows = 0
 					for row in webResult.split('|'):
@@ -186,65 +184,26 @@ class Frame(wx.Frame):
 							except Exception as err:
 								self.m_status.AppendText('Error acknowledging code update\n')
 								time.sleep(2)
-				self.mysqlExecute(False)			
+				self.mysqlExecute(False)
 			if outputs['M'] == 4:
-				timefucker = calendar.timegm(time.localtime())			
+				timestamp = calendar.timegm(time.localtime())
 				if callTimeOut == 0:
-					callTimeOut = timefucker + 15*60
+					callTimeOut = timestamp + 15*60
 					phoneNumberIndex = 0
-				elif timefucker > callTimeOut:
-					self.m_status.AppendText('calling\n')
-					if startedSkype:
-						sms.Text(phoneNumbers[phoneNumberIndex])
-						phoneNumberIndex += 1
-						if phoneNumberIndex < len(phoneNumbers):
-							callTimeOut =timefucker + 30
-						else:
-							callTimeOut =timefucker + 15*60
-							phoneNumberIndex = 0
-					else:
-						self.m_status.AppendText('starting skype\n')
-						sms = SMS()
-						startedSkype = 1						
+				elif timestamp > callTimeOut:
+					self.m_status.AppendText('texting\n')
+					for phoneNumber in phoneNumbers:
+						message = twilioClient.messages.create(to = phoneNumber, from_="+14155555555", body="Boxshop Alarm!")
+					callTimeOut = timestamp + 15*60
 			else:
 				callTimeOut = 0
 			if self.btnEvent > 0:
-				ser.write(btnEventSerCodes[self.btnEvent])									
+				ser.write(btnEventSerCodes[self.btnEvent])
 				self.m_status.AppendText(btnEventDescripts[self.btnEvent] + '\n')
 				self.btnEvent = 0	
 			if (not self.db) and self.dbConnectTryTime < calendar.timegm(time.localtime()) :
-				self.mysqlConnect()									
+				self.mysqlConnect()
 			wx.Yield()
-class SMS():
-	HasConnected = False
-	def AttachmentStatusText(self, status):
-	   return self.skype.Convert.AttachmentStatusToText(status)
-	# This handler is fired when Skype attatchment status changes
-	def OnAttach(self, status):
-		top.m_status.AppendText( 'API attachment status: ' + self.AttachmentStatusText(status) + '\n')
-		if status == Skype4Py.apiAttachAvailable:
-			self.skype.Attach()
-
-	def Text(self, phoneNumber):		
-		# top.m_status.AppendText('Texting ' + phoneNumber + '..' + '\n')
-		message = self.skype.CreateSms(Skype4Py.smsMessageTypeOutgoing, phoneNumber) # create SMS object. CHANGE THE PHONE NUMBER
-		message.Body = "Boxshop Alarm is going off. " # set value of body
-		message.Send() # send message
-	def __init__(self):
-		# Creating Skype object and assigning event handlers..
-		self.notSetOutputFile = True
-		self.skype = Skype4Py.Skype()
-		self.skype.OnAttachmentStatus = self.OnAttach
-
-		# Starting Skype if it's not running already..
-		if not self.skype.Client.IsRunning:
-			top.m_status.AppendText( 'Starting Skype..' + '\n')
-			self.skype.Client.Start()
-		
-		# Attatching to Skype..
-		top.m_status.AppendText( 'Connecting to Skype..' + '\n')
-		self.skype.Attach()
-			
 app = wx.App(redirect=True, filename="logfile.txt")
 top = Frame("Box Shop Alarm Control")
 top.Show()
