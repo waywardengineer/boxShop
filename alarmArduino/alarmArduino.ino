@@ -27,8 +27,11 @@
 #define WEBPOLLINTERVAL 30*60000
 #define SERBUFFERSENDSPACING 500
 
-#define KPPASSWORDLEN 5 //number of chars in a password including the #
-char passwords[][KPPASSWORDLEN] = {{'1','2','3','4', '#'}};
+//#define KPPASSWORDLEN 11 //number of chars in a password including the #
+//char passwords[][KPPASSWORDLEN] = {{'7','4','6','7', '2', '6', '9', '9', '5', '1', '#'}};
+
+#define KPPASSWORDLEN 6 //number of chars in a password including the #
+char passwords[][KPPASSWORDLEN] = {{'5', '6', '8', '8', '7', '#'}, {'4', '3', '5', '9', '9', '#'}};
 
 #include "Keypad.h"
 
@@ -55,7 +58,7 @@ byte colPins[cols] = {
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, rows, cols);
 
-char kpBuffer[12];
+char kpBuffer[14];
 char key = NO_KEY;
 char kpLastKey = NO_KEY;
 unsigned long upTime = 0;
@@ -99,10 +102,10 @@ const byte iTimerSwitch = 31;
 const byte iExitButton = 32;
 const byte iDoorBell = 33;
 
-#define NUMALARMSENSEINPUTS 3
+#define NUMALARMSENSEINPUTS 1
 
-int alarmInputs[NUMALARMSENSEINPUTS][2] = {{iDoorSwitch, 500}, {iGateSwitch, 1500}, {iBeamSensor, 1500}};
-char alarmInputSerialCodes[NUMALARMSENSEINPUTS][2] = {{'D', '0'}, {'G', '0'}, {'B', '0'}};
+int alarmInputs[NUMALARMSENSEINPUTS][2] = {{iDoorSwitch, 500}};//, {iGateSwitch, 1500}, {iBeamSensor, 1500}};
+char alarmInputSerialCodes[NUMALARMSENSEINPUTS][2] = {{'D', '0'}};//, {'G', '0'}, {'B', '0'}};
 int beepRepeatCount;
 int mode;
 int sensorTripped;
@@ -137,7 +140,7 @@ unsigned long deBounceTimeOut[NUMDEBOUNCEDINPUTS];
 int incomingByte;
 
 void setup() {
-  Serial.begin(9600);
+  //Serial.begin(9600);
   //Serial1.begin(9600);
   pinMode (oAlarmBell,OUTPUT);
   pinMode (oAlarmScreech,OUTPUT);
@@ -164,6 +167,7 @@ void setup() {
 }
 
 void loop() {
+  
   lastUpTime = upTime;
   upTime = millis();
   if (upTime < lastUpTime) { // we wrapped!  special case.
@@ -220,7 +224,7 @@ void loop() {
     }
     else {
       digitalWrite(oAlarmBell, LOW);
-    }      
+    }
     break;
   case 2: //armed
     digitalWrite(oArmedLed, blinkLeds(1000, 1000, 0, 1));
@@ -316,7 +320,7 @@ void loop() {
     webPollTimeOut = upTime + WEBPOLLINTERVAL;
   }
   kpGoodPass = false;
-  while (Serial.available() > 0) {// pass messages from usb line to rs485 and decide if it's a message the arduino has to do something about
+  /*while (Serial.available() > 0) {// pass messages from usb line to rs485 and decide if it's a message the arduino has to do something about
     // read the incoming byte:
     incomingByte = Serial.read();
     if (incomingByte == '.'){
@@ -340,7 +344,9 @@ void loop() {
     incomingByte = Serial1.read();
     serBuffer += incomingByte;
   }*/
-  if (upTime > serBufferTimeOut){
+  
+  
+  /*if (upTime > serBufferTimeOut){
     if (serBuffer != String("")){
       serBuffer += String(".");
       Serial.print(serBuffer);
@@ -352,7 +358,7 @@ void loop() {
       serBuffer1 = String("");
       serBufferTimeOut = upTime + SERBUFFERSENDSPACING;
     }
-  }   
+  }  */ 
 }
 void processCommand(){
   switch (incomingComponentId){
