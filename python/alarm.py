@@ -73,6 +73,10 @@ def sendSerialData(adaptorID, data):
 
 
 def checkOnlineCodes(_):
+	global nextCodeCheckAllowedTime
+	if nextCodeCheckAllowedTime and now < nextCodeCheckAllowedTime:
+		return
+	nextCodeCheckAllowedTime = now + datetime.timedelta(seconds=30)
 	HttpRequest('codes.php', {'hash': codeHash}, 'get', handleCodeRequestResult)
 
 def handleCodeRequestResult(result):
@@ -106,7 +110,6 @@ with open(os.path.join(programPath, 'codes.json')) as f:
 codeHash = hashlib.sha256(codeFile).hexdigest()
 processCodeFile(codeFile)
 twilioClient = TwilioRestClient(config['twilioAccountSid'], config['twilioAuthToken'])
-callTimeOut = 0
 systemStatus = {
 	'M': '0', #mode
 	'D': '0', #yard door
@@ -122,7 +125,10 @@ systemStatus = {
 keyPadIds = {'K': 'D', 'L': 'E'}
 
 serialAdaptors = {serialLine: SerialAdaptor(config['serialLines'][serialLine]) for serialLine in config['serialLines']}
+nextCodeCheckAllowedTime = None
+smsTime = None
 while True:
+	now = datetime.datetime.now()
 	eventHappened = False
 	for serialAdaptorId in serialAdaptors:
 		result = serialAdaptors[serialAdaptorId].readLine()
@@ -148,24 +154,21 @@ while True:
 		for k in ['U', 'K', 'L']:
 			systemStatus[k] = '0'
 	if systemStatus['M'] == '4':
-		timestamp = calendar.timegm(time.localtime())
-		if callTimeOut == 0:
-			callTimeOut = timestamp + 15*60
-			phoneNumberIndex = 0
-		elif timestamp > callTimeOut:
-			print 'texting'
+		if not smsTime:
+			smsTime = now + datetime.timedelta(minutes=15)
+	else:
+		smsTime = None
+	if smsTime:
+		if now > smsTime:
 			for name, phoneNumber in config['phoneNumbers'].items():
 				print 'Texting' + name
 				message = twilioClient.messages.create(to=phoneNumber, from_=config['fromNumber'], body="Boxshop Alarm!")
-			callTimeOut = timestamp + 15*60
-		else:
-			callTimeOut = 0
-	now = datetime.datetime.now()
-	if config['offHour'] < now.hour < config['onHour']:
+			smsTime = now + datetime.timedelta(minutes=15)
+	if config['offHour'] <= now.hour < config['onHour']:
 		if systemStatus['M'] in ['2', '3']:
 			sendSerialData('main', {'M': '1'})
 	else:
 		if systemStatus['M'] in ['1']:
 			sendSerialData('main', {'M': '3'})
 
-	time.sleep(0.2)
+	time.sleep(0.1)
