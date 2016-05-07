@@ -48,7 +48,6 @@ class Code(object):
 			return self.data[item]
 
 	def check(self, keypadID, currentTimestamp, code):
-		print self.code
 		if keypadID not in self.keypads:
 			return False
 		if not self.startDate == "0" and not (self.startDate < currentTimestamp < self.endDate):
@@ -146,7 +145,7 @@ while True:
 						if code.check(component, timestamp, componentStatus):
 							responseCode = '2'
 							systemStatus['U'] = code.user
-							continue
+							break
 					sendSerialData(serialAdaptorId, {keyPadIds[component]: responseCode})
 					systemStatus[keyPadIds[component]] = responseCode
 	if eventHappened:
