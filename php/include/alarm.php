@@ -1,5 +1,5 @@
 <?php
-if ($auth!='auth') {die();};
+if ($authkey!='boxshop94124') {die();};
 
 class Alarm {
 	public function getstatus(){//see what the database says the status is, and if it hasn't been updated in awhile, set the status to the "connection failed" state
@@ -25,23 +25,26 @@ class Alarm {
 		global $database;
 		$inputVars = array('M', 'D', 'E', 'G', 'H', 'B', 'W');
 		$keyPadCodes = array('D'=>'K', 'E'=>'L');
+		$json = file_get_contents('php://input');
+		$data = json_decode($json, true);
+		
 		foreach ($inputVars as $i => $value){
-			if (!is_null($_GET[$value])){
+			if (array_key_exists($value, $data)){
 				$q="SELECT ID, timestamp, state FROM alarmevents WHERE componentID = '$value' ORDER BY timestamp DESC LIMIT 1;";
 				$row=@mysql_fetch_array($database->query($q));
-				if ($_GET[$value] != $row['state']){
+				if ($data[$value] != $row['state']){
 					$uid = -1;
 					$extra = '';
 					if ($value == 'D' or $value =='E'){
-						if ($_GET['U'] > 0){
-							$uid = $_GET['U'];
+						if ($data['U'] > 0){
+							$uid = $data['U'];
 						}
-						if ($_GET[$keyPadCodes[$value]]){
-							$extra .= $_GET[$keyPadCodes[$value]];
+						if ($data[$keyPadCodes[$value]]){
+							$extra .= $data[$keyPadCodes[$value]];
 						}
 					}
 						
-					$q="INSERT INTO alarmevents(componentID, state, timestamp, UID, extra) VALUES ('$value', $_GET[$value], " . time() . ", $uid, '$extra');";
+					$q="INSERT INTO alarmevents(componentID, state, timestamp, UID, extra) VALUES ('$value', $data[$value], " . time() . ", $uid, '$extra');";
 					$database->query($q);
 				}
 			}
@@ -144,15 +147,14 @@ class Guestcodes {
 				}
 			}
 			$database->query($q);
-			$this->doCodeSQLLog($q);
+			$compiledCodes = ($this->compileCodeJson());
+			$codeHash = hash('sha256', $compiledCodes);
+			$q = "UPDATE settings SET data = '" . $codeHash . "' WHERE setting = 'currentCodeHash';";
+			$database->query($q);
+			
 			return 1;
 		}
 				
-	}
-	public function doCodeSQLLog($query){
-		global $database;
-		$q = 'INSERT INTO codesyncsql (query, done) VALUES ("' . htmlentities($query) . '", 0);';
-		$database->query($q);
 	}
 	public function getGuestCodes($uid){
 		global $database;
@@ -179,14 +181,24 @@ class Guestcodes {
 		}
 		return $output;
 	}
-				
-			
-			
-		
-		
-
-		
-		
-	
+	public function compileCodeJson(){
+		global $database;
+		$result=$database->query("SELECT * FROM codes");
+		$outputData = array();
+		$keyPadCodes = array('K', 'L', 'M');
+		if (mysql_num_rows($result)){
+			while ($row = mysql_fetch_array($result)){
+				$keypads = array();
+				foreach($keyPadCodes as $k=>$keypadId){
+					if ($row['keyPad' . $keypadId] == 1){
+						$keypads[] = $keypadId;
+					}
+				}
+				$outputRow = array('code'=>$row['code'], 'user'=>$row['UID'], 'startDate'=>$row['startDate'], 'endDate'=>$row['endDate'], 'keypads'=>$keypads);
+				$outputData[] = $outputRow;
+			}
+		}
+		return json_encode($outputData);
+	}
 
 }

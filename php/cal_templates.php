@@ -38,7 +38,7 @@ class eventTemplate {
 				
 			<div class="calheader">
 			<a style="font-size:12px;" onclick="{showlist}">(View as List)</a></p>
-			<span style="display:block; width:490px; text-align:center;">
+			<span style="display:block; width:546px; text-align:center;">
 			<a id="prev" onclick="{prevaction}" style="float:left;">Previous Month</a><strong>{thismonth}</strong>
 			<a id="nextmonth" onclick="{nextaction}" style="float:right; margin-right:10px;">Next Month</a></span></div>
 			<div class="mainCalendar" style="height:{height}px; width:{width}px;">

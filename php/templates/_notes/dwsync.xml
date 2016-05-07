@@ -28,4 +28,27 @@
 <file name="admin.tpl" server="localhost/boxshop/" local="130048722167650509" remote="130048722000000000" Dst="1" />
 <file name="front.tpl" server="localhost/boxshop/" local="130048766289974161" remote="130048766400000000" Dst="1" />
 <file name="forgotpass.tpl" server="localhost/boxshop/" local="130048816929370569" remote="130048816800000000" Dst="1" />
+<file name="historybody.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070664392277995" remote="130349340000000000" Dst="2" />
+<file name="admin.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666881740384" remote="130349340000000000" Dst="2" />
+<file name="cal_editmulti.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666881740384" remote="130349340000000000" Dst="2" />
+<file name="cal_editsingle.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666881770385" remote="130349340000000000" Dst="2" />
+<file name="calendar.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666884340532" remote="130349340000000000" Dst="2" />
+<file name="cnc.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666884340532" remote="130353660000000000" Dst="2" />
+<file name="codes.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666884420537" remote="130349340000000000" Dst="2" />
+<file name="editaccount.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666886980683" remote="130349340000000000" Dst="2" />
+<file name="editbody.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666886980683" remote="130349340000000000" Dst="2" />
+<file name="forgotpass.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666886990684" remote="130349340000000000" Dst="2" />
+<file name="front.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666889770843" remote="130349340000000000" Dst="2" />
+<file name="home.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666889780844" remote="130349340000000000" Dst="2" />
+<file name="logs.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666889820846" remote="130349340000000000" Dst="2" />
+<file name="main.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666897601291" remote="130349340000000000" Dst="2" />
+<file name="nav.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666897611291" remote="130349340000000000" Dst="2" />
+<file name="page.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666897651294" remote="130349340000000000" Dst="2" />
+<file name="register.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666900301445" remote="130349340000000000" Dst="2" />
+<file name="supplies.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666900311446" remote="130349340000000000" Dst="2" />
+<file name="supplieslog.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666900361449" remote="130349340000000000" Dst="2" />
+<file name="wikiAddPage.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666902941596" remote="130349340000000000" Dst="2" />
+<file name="wikiEditSection.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666902951597" remote="130349340000000000" Dst="2" />
+<file name="wikiHistory.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666902971598" remote="130349340000000000" Dst="2" />
+<file name="wikiSection.tpl" server="members.boxshopsf.org/public_html/boxshop/members/" local="131070666904441682" remote="130349340000000000" Dst="2" />
 </dwsync>

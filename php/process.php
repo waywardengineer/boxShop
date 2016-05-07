@@ -1,5 +1,5 @@
 <?php
-$auth='auth';
+$authkey='boxshop94124';
 date_default_timezone_set('America/Los_Angeles');
 
 /**

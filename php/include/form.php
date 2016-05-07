@@ -1,5 +1,5 @@
 <?php 
-if ($auth!='auth') {die();};
+if ($authkey!='boxshop94124') {die();};
 
 /**
  * Form.php

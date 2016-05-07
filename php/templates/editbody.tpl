@@ -1,4 +1,3 @@
-
 <form name="edit" id="pageEditor" method="post" action="edit.php?l={PAGENAME}">
 Page Heading: <input type="text" name="pageheading" value="{EDITSECTIONHEADING}" /><br />
 <p><input type="submit" value="Save" /></p>

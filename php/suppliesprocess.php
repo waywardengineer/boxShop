@@ -1,10 +1,9 @@
 <?php
-$auth='auth';
+$authkey='boxshop94124';
 
 include ('include/user.php');
 if (!$user->isTrusted()){die();}
 if (isset($_POST)){
-	print_r($_POST);
 	$id = false;
 	$processedArray = array();
 	$error = false;

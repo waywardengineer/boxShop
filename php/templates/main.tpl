@@ -3,6 +3,7 @@
 <title>Boxshop Online</title>
 <link href="{dir}css/style.css" rel="stylesheet" type="text/css">
 <link href="{dir}css/nav.css" rel="stylesheet" type="text/css">
+<link media="handheld, only screen and (max-width: 480px), only screen and (max-device-width: 480px)" href="{dir}css/mobile.css" type="text/css" rel="stylesheet"> 
 
 <link rel="stylesheet" href="{dir}css/ui-darkness/jquery-ui-1.8.16.custom.css" type="text/css" media="screen">
 <script type="text/javascript" src="{dir}scripts/jquery.js"></script>
@@ -110,7 +111,7 @@
 <body>
 <div id="header">
 <h1><a href="index.php">Boxshop Online</a></h1>
-<p>{msg}</p>
+<p class="welcome">{welcome}</p>
 {nav}
 
 </div>

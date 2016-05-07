@@ -1,14 +1,7 @@
 <?php 
-$auth='auth';
-date_default_timezone_set('America/Los_Angeles');
+$authkey='boxshop94124';
 include("include/common.php");
-$html = new Template('templates/main.tpl');
-$html->createNav();
-
-
-$subTemplate = new Template("templates/wikiAddPage.tpl");
-
-$html->set("content", $subTemplate->doOutput());
+$html->addSubTemplate("templates/wikiAddPage.tpl");
 echo $html->doOutput();
 
 ?>

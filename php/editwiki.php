@@ -1,9 +1,7 @@
 <?php 
-$auth='auth';
+$authkey='boxshop94124';
 date_default_timezone_set('America/Los_Angeles');
 include("include/common.php");
-$html = new Template('templates/main.tpl');
-$html->createNav();
 include("include/templateAddons.php");
 if (!$user->isTrusted()){
 	header("Location: index.php");
@@ -52,7 +50,7 @@ if (isset($_POST['savesection'])){
 		}
 	}
 		
-	$querystring="INSERT INTO wiki_section_contents (section_id, edited_by, txt, heading) VALUES ($id, '" . $userdata['username'] . "', '" . addslashes($_POST['sectioncontents']) . "', '" . $_POST['pageheading'] . "');";
+	$querystring="INSERT INTO wiki_section_contents (section_id, edited_by, txt, heading) VALUES ($id, '" . $user->username . "', '" . addslashes($_POST['sectioncontents']) . "', '" . $_POST['pageheading'] . "');";
 	if (@mysql_query($querystring) && !$err){
 		$querystring="SELECT id FROM wiki_section_contents WHERE section_id = $id ORDER BY id DESC LIMIT 1";
 		$result=mysql_query($querystring);
@@ -73,7 +71,7 @@ else {
 		$querystring="SELECT txt, heading FROM wiki_section_contents WHERE section_id = $id ORDER BY date_ent DESC LIMIT 1";
 		$result=mysql_query($querystring);
 		$section=@mysql_fetch_array($result, MYSQL_ASSOC);
-		$subTemplate->setMulti(array('heading' => $section['heading'], 'content' => $section['txt'], 'ID' => $id, 'PAGENAME' => $l));
+		$subTemplate->setMulti(array('heading' => $section['heading'], 'content' => stripslashes($section['txt']), 'ID' => $id, 'PAGENAME' => $l));
 	}
 	$subTemplate->setMulti(array('tabs'=> $subTemplate->makeTabs($tabs), 'id'=>$id, 'l' => $l));
 	$subTemplate->xinhaInit($l);

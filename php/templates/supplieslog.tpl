@@ -1,9 +1,7 @@
 {scripts}
 
 <link href="DataTables-1.9.4/media/css/jquery.dataTables.css" rel="stylesheet" type="text/css">
-<link rel="stylesheet" href="Boxshop%20Security%20System_files/jquery-ui-1.css" type="text/css" media="screen">
 <script type="text/javascript" language="javascript" src="DataTables-1.9.4/media/js/jquery.dataTables.js"></script>
-<script type="text/javascript" language="javascript" src="DataTables-1.9.4/examples/examples_support/jquery.jeditable.js"></script>
 
 <script type="text/javascript">
 var items = {shitHead};

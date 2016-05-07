@@ -1,23 +1,19 @@
 <?php
-$auth='auth';
+$authkey='boxshop94124';
 include("include/common.php");
 include("include/alarm.php");
 $alarm = new Alarm();
 if($user->logged_in){
-	$html = new Template('templates/main.tpl', 'templates/front.tpl');
+	$html->addSubTemplate('templates/front.tpl');
 	$welcome_msg = "Welcome, $user->username";
 }
 else {
-	$html = new Template('templates/main.tpl');
-	$welcome_msg="Hello, guest";
 	$html->set('formLoginUser', $form->value("user"));
 	$html->set('formLoginUserError', $form->error("user"));
 	$html->set('formLoginPass', $form->value("pass"));
 	$html->set('formLoginPassError', $form->error("pass"));
 	$showsections[]='login';
 }
-$html->createNav();
-
 $alarmStatus=$alarm->getstatus();
 $alarmStatusDescriptions = array(1 => 'Not Armed', 2 => 'Armed', 3 => 'Waiting to Arm', 4 => 'Alarm',  5 => 'Resetting from alarm', 6 => 'Unable to connect to alarm');
 
@@ -54,8 +50,5 @@ if($user->isTrusted()){
 		
 	
 }
-
-
-$html->set('welcome', $welcome_msg);
 echo $html->doOutput($showsections);
 

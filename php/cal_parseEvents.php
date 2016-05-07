@@ -9,7 +9,7 @@ define('AUTH', 'YFNA');
 
 require_once('cal_templates.php');
 
-$auth='auth';
+$authkey='boxshop94124';
 include("include/common.php");
 
 if (! defined('ICAL_EVENTS_DEBUG')) define('ICAL_EVENTS_DEBUG', false);
@@ -25,11 +25,9 @@ class events {
 	public $alllocations;
 	public $locations;
 	public function __construct($sqlparams=null){
-		$querystring="SELECT cal_events.ID AS UID, cal_events.starttime AS StartTime, cal_events.endtime AS EndTime, cal_events.title AS Summary, cal_events.description AS Description, cal_events.addedby AS addedBy, cal_events.location AS LocationID, cal_events.category AS CategoryID, cal_location.description AS Location, cal_category.description AS Category
+		$querystring="SELECT cal_events.ID AS UID, cal_events.starttime AS StartTime, cal_events.endtime AS EndTime, cal_events.title AS Summary, cal_events.description AS Description, cal_events.addedby AS addedBy, 0 AS LocationID, 0 AS CategoryID, '' AS Location, '' AS Category
 				FROM cal_events
-				LEFT JOIN cal_location ON cal_location.ID = cal_events.location
-				LEFT JOIN cal_category ON cal_category.ID = cal_events.category 
-				WHERE $sqlparams";
+				";
 		$result=@mysql_query($querystring);
 		$this->allevents=array();
 		while ($row=@mysql_fetch_array($result)){
@@ -56,7 +54,7 @@ class events {
 			if (!(!$event['Summary'] && !$event['Description'])){
 					$date_txt = htmlentities(date($date_format, $event['StartTime']));
 				if ($event['Summary']) {
-					$summary_txt = htmlentities($event['Summary']);
+					$summary_txt = $event['Summary'];
 				}
 				else {
 					$summary_txt='No event Summary';

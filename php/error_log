@@ -1,0 +1,1 @@
+[26-Jun-2014 10:24:10 America/Los_Angeles] PHP Warning:  Missing argument 3 for userclass::login(), called in /home/firemor9/public_html/boxshop/members/process.php on line 110 and defined in /home/firemor9/public_html/boxshop/members/include/user.php on line 124

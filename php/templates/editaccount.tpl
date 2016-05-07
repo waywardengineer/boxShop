@@ -1,9 +1,14 @@
+{scripts}
+
+
+{/scripts}
+
+
+{content}
 
     <div class="addpass">
     	{editmsg}
         
-        {editform}
-                     <p>Doorcodes must be at least 5 digits long. You can enter numbers or letters corresponding to a phone keypad.</p>
 
         <form action="process.php" method="post">
             <input type="hidden" name="subedit" value="1">
@@ -20,14 +25,7 @@
             </div>
 
 
-            {formUserCodeErr}
-            <div class="formRow">
-                <div style="position:absolute; top:6px; left:0px; width:190px; text-align:right">Doorcode:</div>
-                <input id="codeCode" name="userCode" maxlength="30" class="formfield" type="text" value="{formUserCode}" style="position:absolute; top:5px; left:200px;">
-                <input name="Button" type="button" class="submitbtn" style="position: absolute; top: -2px; left: 370px;" value="Make Random Code" onclick="getRandomCode()">
-
-            </div>
-            {form_userEmailError}
+           {form_userEmailError}
             <div class="formRow">
                 <div style="position:absolute; top:6px; left:0px; width:190px; text-align:right">Email:</div>
                 <input name="userEmail" maxlength="50" class="formfield" type="text" value="{form_userEmail}" style="position:absolute; top:5px; left:200px;">
@@ -36,5 +34,5 @@
                 <input value="Update" class="submitbtn" type="submit" style="position:absolute; top:5px; left:200px;">
             </div>
        </form>
-        {/editform}
     </div>
+    {/content}

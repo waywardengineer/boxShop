@@ -1,7 +1,6 @@
 {scripts}
 
 <link href="DataTables-1.9.4/media/css/jquery.dataTables.css" rel="stylesheet" type="text/css">
-<link rel="stylesheet" href="Boxshop%20Security%20System_files/jquery-ui-1.css" type="text/css" media="screen">
 <script type="text/javascript" language="javascript" src="DataTables-1.9.4/media/js/jquery.dataTables.js"></script>
 <script type="text/javascript" language="javascript" src="DataTables-1.9.4/examples/examples_support/jquery.jeditable.js"></script>
 <script type="text/javascript">
@@ -29,7 +28,10 @@
 			$("#itemTable tbody").find("td:first").append('<br><input type="button" onclick="enterRecord()" value="New record">');
 		}
 	}
-		
+	function updateCategory(){
+		$('#itemTable').dataTable().fnDraw()
+		addButtonIfEmpty();
+	}
 
 	function fnFormatDetails ( oTable, nTr ){
 		var arr=new Array();
@@ -91,6 +93,7 @@
 		$("#itemTable tbody").find("td:first").empty().append(fnFormatDetails(oTable));
 		showLogForm();
 		$("#categoryID").val($("#categoryInput").val());
+		toggleNewEntry();
 	}
 	$(document).ready(function() {
 		$("#itemTable tbody tr").click( function( e ) {
@@ -124,7 +127,8 @@
 				{ "bVisible": false, "aTargets": [ 0 ] },
 				{ "bVisible": false, "aTargets": [ 1 ] }
 			] } );
-	} );
+			addButtonIfEmpty();
+	} );updateCategory
 
 
 
@@ -136,7 +140,7 @@
 {content}
 
 <div style="float:left">
-    <span style="margin:4px 4px 4px 0px;">Category:</span><select id="categoryInput" onchange="$('#itemTable').dataTable().fnDraw()" name="categoryInput" maxlength="30" class="formfield" type="text"><option selected="selected" value="0"></option>{categoryOptions}</select>
+    <span style="margin:4px 4px 4px 0px;">Category:</span><select id="categoryInput" onchange="updateCategory()" name="categoryInput" maxlength="30" class="formfield" type="text"><option selected="selected" value="0"></option>{categoryOptions}</select>
 </div>
 <div class="clear"></div>
 

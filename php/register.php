@@ -1,10 +1,7 @@
 <?php
-date_default_timezone_set('America/Los_Angeles');
-$auth='auth';
-include("include/user.php");
-include("include/template.php");
-$html = new Template('templates/main.tpl', 'templates/register.tpl');
-$html->createNav();
+$authkey='boxshop94124';
+include("include/common.php");
+$html->addSubTemplate('templates/register.tpl');
 $showsections = array();
 if($user->logged_in and !isset($_SESSION['regsuccess'])){
 	header("Location: index.php");
@@ -68,6 +65,5 @@ else{
 }
 
 
-$html->set('welcome', $welcome_msg);
 $html->set('regmsg', $regmsg);
 echo $html->doOutput($showsections);

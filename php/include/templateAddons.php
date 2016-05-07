@@ -1,5 +1,5 @@
 <?php
-if ($auth!='auth') {die();};
+if ($authkey!='boxshop94124') {die();};
 
 class wikiTemplate extends Template{
 	
@@ -48,10 +48,9 @@ class wikiTemplate extends Template{
 					[
 					'CharacterMap',
 					'ContextMenu',
-					'ListType',
+					
 					'Stylist',
 					'Linker',
-					'SuperClean',
 					'TableOperations',
 					'CSSPicker',
 					'ExtendedFileManager'
@@ -75,8 +74,8 @@ class wikiTemplate extends Template{
 				["linebreak","separator","justifyleft","justifycenter","justifyright","justifyfull"],
 				["separator","insertorderedlist","insertunorderedlist","outdent","indent"],
 				["separator","inserthorizontalrule","createlink","insertimage","inserttable"],
-				["linebreak","separator","undo","redo","selectall","print"], (Xinha.is_gecko ? [] : ["cut","copy","paste","overwrite","saveas"]),
-				["separator","killword","clearfonts","removeformat","toggleborders","splitblock","lefttoright", "righttoleft"],
+				["linebreak","separator","undo","redo"], (Xinha.is_gecko ? [] : ["cut","copy","paste","overwrite","saveas"]),
+				["separator","lefttoright", "righttoleft"],
 				["separator","htmlmode","showhelp","about"]
 				];
 			xinha_config.pageStyleSheets = [ "css/editstyle.css" ];

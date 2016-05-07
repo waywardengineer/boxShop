@@ -1,5 +1,5 @@
 <?php 
-$auth='auth';
+$authkey='boxshop94124';
 include('include/user.php');
 if (!$user->isTrusted()) die();
 $url = $_POST['redirURL'];

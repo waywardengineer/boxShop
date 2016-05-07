@@ -1,10 +1,6 @@
 <?php 
-$auth='auth';
-date_default_timezone_set('America/Los_Angeles');
+$authkey='boxshop94124';
 include("include/common.php");
-$html = new Template('templates/main.tpl');
-$html->createNav();
-
 include("include/templateAddons.php");
 if (!$user->isTrusted()){
 	header("Location: index.php");
@@ -26,7 +22,7 @@ while ($section=@mysql_fetch_array($result, MYSQL_ASSOC)){
 	$tabs =array();
 	$tabs[] = array('text' => 'Edit', 'url' => 'editwiki.php?id=' . $section['id'] . '&l=' . $l, 'selected' => false);
 	$tabs[] = array('text' => 'New&nbsp;Section', 'url' => 'editwiki.php?id=0&l=' . $l, 'selected' => false);
-	$subTemplate->setMulti(array('content'=>$section['contents'], 'tabs'=> $subTemplate->makeTabs($tabs), 'heading'=>$section['heading'], 'lastEdit'=>"Last edited by {$section['editedby']} on {$section['date_ent']}"));
+	$subTemplate->setMulti(array('content'=> stripslashes($section['contents']), 'tabs'=> $subTemplate->makeTabs($tabs), 'heading'=>$section['heading'], 'lastEdit'=>"Last edited by {$section['editedby']} on {$section['date_ent']}"));
 	$output .= $subTemplate->doOutput();
 }
 if ($output == '') {
@@ -37,7 +33,7 @@ if ($output == '') {
 	$subTemplate->setMulti(array('content'=>'There\'s nothing on this page yet! Click Edit to add something.', 'tabs'=> $subTemplate->makeTabs($tabs), 'heading'=>'Empty Page'));
 	$output = $subTemplate->doOutput();
 }
-	
+$html->set('welcome', $welcome_msg);
 $html->set("content", $output);
 echo $html->doOutput();
 

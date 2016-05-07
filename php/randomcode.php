@@ -1,6 +1,6 @@
 <?php
 
-$auth='auth';
+$authkey='boxshop94124';
 include("include/database.php");
 include("include/alarm.php");
 $guestcodes = new Guestcodes();

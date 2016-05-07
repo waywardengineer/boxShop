@@ -1,19 +1,7 @@
 <?php 
-$auth='auth';
+$authkey='boxshop94124';
 include("include/common.php");
-$html = new Template('templates/main.tpl', 'templates/calendar.tpl');
-$html->createNav();
-if($user->logged_in){
-	$welcome_msg = "Welcome, $user->username";
-}
-else {
-	$welcome_msg="Hello, guest";
-	$html->set('formLoginUser', $form->value("user"));
-	$html->set('formLoginUserError', $form->error("user"));
-	$html->set('formLoginPass', $form->value("pass"));
-	$html->set('formLoginPassError', $form->error("pass"));
-	$showsections[]='login';
-}
+$html->addSubTemplate('templates/calendar.tpl');
 $pocessedArray = array();
 if (isset($_REQUEST)){
 	foreach ($_REQUEST as $k=>$v){
@@ -87,7 +75,6 @@ if ($errors){
 	}
 	$html->set('message', $output);
 }
-
 echo $html->doOutput();
 
 
@@ -115,7 +102,7 @@ function processForm(){
 	$inputs = array();
 	foreach($formfields as $formfield){
 		if (isset($_POST[$formfield])) {
-			$inputs[$formfield] =  validate($_POST[$formfield]);
+			$inputs[$formfield] =  htmlspecialchars($_POST[$formfield]); 
 		}
 		else if (in_array($formfield, $required)){
 			$errors[]=array('description'=>'You forgot to fill out one of the needed fields on the form', 'field'=>$formfield);

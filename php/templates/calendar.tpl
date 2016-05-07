@@ -32,7 +32,7 @@
 {content}
 
 {message}
-<a class="tabs" href="calendar.php?action=addsingle">Add a non-repeating event</a><a class="tabs" href="calendar.php?action=addmulti">Add a repeating event</a>
+<a class="tab" href="calendar.php?action=addsingle">Add a non-repeating event</a><a class="tab" href="calendar.php?action=addmulti">Add a repeating event</a>
 {calForms}
 <div id="eventMenu"></div>
 <div id="calendardiv">

@@ -46,7 +46,13 @@
 		$('#cncLogs').find('thead th').each(function(){
 			  arr.push( $(this).width() ); // <== returns 0 ???
 		})
-		var aData = oTable.fnGetData( nTr );
+		if (oTable.fnSettings().fnRecordsDisplay()==0){
+			var aData = new Array( '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '');
+		}
+		else {
+
+			var aData = oTable.fnGetData( nTr );
+		}
 		var sOut = '<form action="cncprocess.php" method="post"><table cellpadding="5" cellspacing="3" border="0" ><tr>';
 		sOut += '<tr><td style="padding: 3px 10px; width: ' + arr[0] + 'px;"><select id="materialID" name="materialID" type="text">{materialOptions}</select></td>';
 		sOut += '<td style="padding: 3px 10px; width: ' + arr[1] + 'px;"><select id="thicknessID" name="thicknessID" type="text">{thicknessOptions}</select></td>';
@@ -58,15 +64,17 @@
 		sOut += '<td style="padding: 3px 10px; width: ' + arr[7] + 'px;"><input class="cncRecordSmallInput" id="pierceDelay" name="pierceDelay" maxlength="20" type="text" value="' + aData[9] +'"></td>';
 		sOut += '<td style="padding: 3px 10px; width: ' + arr[8] + 'px;"><input class="cncRecordSmallInput" id="PSI" name="PSI" maxlength="20" type="text" value="' + aData[10] +'"></td>';
 		sOut += '<td style="padding: 3px 10px; width: ' + arr[9] + 'px;"><input class="cncRecordSmallInput" id="kerf" name="kerf" maxlength="20" type="text" value="' + aData[11] +'"></td>';
-		sOut += '<td style="padding: 3px 10px; width: ' + arr[10] + 'px;"><input id="notes" name="notes" maxlength="20" type="text" value="' + aData[12] +'"></td>';
+		sOut += '<td style="padding: 3px 10px; width: ' + arr[10] + 'px;"><textarea id="notes" name="notes" cols="20" rows="2">' + aData[12] +'</textarea></td>';
 
 		sOut += '</tr></table>';
 		sOut += '<input type="submit" value="Use setting"></form>';
 		return sOut;
 	}
 	function enterRecord(){
-		$("#cncLog tbody").find("td:first").empty().append(fnFormatDetails(oTable));
+		$("#cncLogs tbody").find("td:first").empty().append(fnFormatDetails(oTable));
 		$("#materialID").val($("#materialInput").val());
+		$("#thicknessID").val($("#thicknessInput").val());
+
 	}
 
 	$(document).ready(function() {
@@ -97,6 +105,7 @@
 		
 		oTable = $('#cncLogs').dataTable({
 			"sDom": '<"H">rt<"F"lip>',
+			"aaSorting" :[[ 14, "desc" ]],
 			"aoColumnDefs": [
 				{ "bVisible": false, "aTargets": [ 0 ] },
 				{ "bVisible": false, "aTargets": [ 1 ] }
@@ -113,7 +122,7 @@
 
 <div style="float:left">
     <span style="margin:4px 4px 4px 0px;">Material:</span><select id="materialInput" onchange="$('#cncLogs').dataTable().fnDraw(); addButtonIfEmpty()" name="materialInput" maxlength="30" class="formfield" type="text">{materialOptions}</select>
-    <span style="margin:4px 4px 4px 20px;;">Thickness:</span><select id="thicknessInput" onchange="$('#cncLogs').dataTable().fnDraw()" name="thicknessInput" maxlength="30" class="formfield" type="text">{thicknessOptions}</select>
+    <span style="margin:4px 4px 4px 20px;;">Thickness:</span><select id="thicknessInput" onchange="$('#cncLogs').dataTable().fnDraw(); addButtonIfEmpty()" name="thicknessInput" maxlength="30" class="formfield" type="text">{thicknessOptions}</select>
 </div>
 <div class="clear"></div>
 

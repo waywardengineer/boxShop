@@ -1,21 +1,12 @@
 <?php
-$auth='auth';
+$authkey='boxshop94124';
 include("include/common.php");
-$html = new Template('templates/main.tpl', 'templates/supplieslog.tpl');
-$html->createNav();
-include("include/alarm.php");
-if($user->logged_in){
-	$welcome_msg = "Welcome, $user->username";
+if (!$user->isTrusted()){
+	header("Location: index.php");
+	die();
 }
-else {
-	$html = new Template('templates/main.tpl');
-	$welcome_msg="Hello, guest";
-	$html->set('formLoginUser', $form->value("user"));
-	$html->set('formLoginUserError', $form->error("user"));
-	$html->set('formLoginPass', $form->value("pass"));
-	$html->set('formLoginPassError', $form->error("pass"));
-	$showsections[]='login';
-}
+
+$html->addSubTemplate('templates/supplieslog.tpl');
 if($user->isTrusted()){
 	$resultsArray = array(array('categoryID', 'itemID', 'UID', 'Category', 'Item', 'Quantity', 'Cost', 'Date', 'Bought by', 'Notes'));
 	$query="SELECT categoryID, itemID, UID, category, item, qty, cost, FROM_UNIXTIME(supplies_purchases.timestamp, '%m.%d.%Y') AS datestr, username, notes FROM ((supplies_purchases JOIN supplies_items USING(itemID)) JOIN supplies_categories USING(categoryID)) JOIN users USING (UID) ORDER BY supplies_purchases.timestamp DESC";	
@@ -53,10 +44,5 @@ if($user->isTrusted()){
 	$html->set('userOptions', $html->makeFormOptions($arr));
 	$html->set('itemTable', $html->makeTable($resultsArray, 'Supply Items', true, false, 'itemTable'));
 }
-
-
-//die();
-$html->set('msg', $welcome_msg);
-//echo htmlspecialchars($html->doOutput(array()));
 echo $html->doOutput(array());
 

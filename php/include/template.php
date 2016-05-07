@@ -1,5 +1,5 @@
 <?php
-if ($auth!='auth') {die();};
+if ($authkey!='boxshop94124') {die();};
 
 class Template {
 	protected $values = array();
@@ -9,26 +9,27 @@ class Template {
 		if (!file_exists($this->file)) {
 	        return "Error loading template file ($this->file).<br />";
 		}
-		if ($subTemplateFile && !file_exists($subTemplateFile)) {
-	        return "Error loading template file ($subTemplateFile).<br />";
-		}
 		$this->output = file_get_contents($this->file);
-		if ($subTemplateFile){
-			$subTemplate = file_get_contents($subTemplateFile);
-			$subTemplateSections = array('scripts', 'content');
-			foreach($subTemplateSections as $sectionName){
-				$reResults = array();
-				$reString = '/({' . $sectionName . '})(.*)({\/' . $sectionName . '})/s';
-				preg_match($reString, $subTemplate, $reResults);
-				//$this->values[$sectionName] = $reResults[2];
-				$matchstring = '{' . $sectionName . '}';
-				$this->output = str_replace($matchstring, $reResults[2], $this->output);
-
-			}
-
-		}
 			
     }
+	public function addSubTemplate($subTemplateFile){
+		if (!file_exists($subTemplateFile)) {
+	        return "Error loading template file ($subTemplateFile).<br />";
+		}
+		$subTemplate = file_get_contents($subTemplateFile);
+		$subTemplateSections = array('scripts', 'content');
+		foreach($subTemplateSections as $sectionName){
+			$reResults = array();
+			$reString = '/({' . $sectionName . '})(.*)({\/' . $sectionName . '})/s';
+			preg_match($reString, $subTemplate, $reResults);
+			//$this->values[$sectionName] = $reResults[2];
+			$matchstring = '{' . $sectionName . '}';
+			$this->output = str_replace($matchstring, $reResults[2], $this->output);
+
+		}
+	}
+		
+		
 	public function set($key, $value) {
 		$this->values[$key] = $value;
 	}
@@ -40,41 +41,6 @@ class Template {
 	
 	
 	
-	public function makeEventLog($result, $isAdmin, $listOnly = false){
-		global $guestcodes;
-		$columnWidths=array(140, 250, 110);
-		$columnTitles=array('Component', 'Description', 'Time');
-		if ($isAdmin){
-			$columnWidths[] = 100;
-			$columnTitles[] = 'User';
-		}
-		if (!$listOnly){
-			$output = '<div class="infobox_header">';
-			$output .=  $this->makeListRow($columnTitles, $columnWidths, 1, 'eventlog_col', '<div>', '</div>');
-			$output .= '</div><div class="infobox_info" id="eventlog">';
-		}
-		else {
-			$output = '';
-		}
-		$today = $guestcodes->startOfToday();
-		$yesterday = $today-(24*3600);
-		while ($row=@mysql_fetch_array($result)){
-			$eventTime = $row['timestamp'];
-			if($eventTime >= $today){$time=date('\T\o\d\a\y g:ia', $eventTime);}
-			else if($row['timestamp'] >= $yesterday){$time=date('\Y\e\s\t\e\r\d\a\y g:ia', $eventTime);}
-			else {$time=date('M j g:ia', $eventTime);}
-			$arr = array($row['component'], $row['description'], $time);
-			if ($isAdmin){
-				$arr[] = $row['username'];
-			}
-			
-			$output.=$this->makeListRow($arr, $columnWidths, 0, 'eventlog_col', '<div class="eventlog_' . $row['type'] . $row['state'] . '">', '</div>');
-		}
-		if (!$listOnly){
-			$output .= '</div>';
-		}
-		return $output;									   
-	}
 	public function makeUserList($result) {
 		$columnWidths=array(120, 200, 120, 170, 120, 120);
 		$ulevelNames = array(1 =>'New User', 2=>'Trusted', 9=>'Admin');	
@@ -186,13 +152,13 @@ class Template {
 		$output=$before . $output . $after;
 		return $output;
 	}
-	public function makeBarGraph($values, $maxHeight, $labelSkip, $title){
+	public function makeBarGraph($values, $maxHeight, $labelSkip){
 		$totalWidth=800;
 		$spacing=1;
 		$totalHeight=180;
 		$labelCount = 1;
 		$barWidth=intval($totalWidth/count($values))-$spacing;
-		$output='<div class="infobox_header"><strong>' . $title . '</strong></div><div class="infobox_info">';
+		$output='';
 		$left=25;
 		$sideWaysTxtLimit = 30;
 		if ($barWidth < $sideWaysTxtLimit){
@@ -205,7 +171,7 @@ class Template {
 		
 		foreach($values as $value){
 			$height = intval(($totalHeight * $value[1])/$maxHeight);
-			$top = $totalHeight - $height + 15;
+			$top = $totalHeight - $height + 50;
 			if ($value[1] > 0 && (($height > 20 and $barWidth > $sideWaysTxtLimit) or $height > 40)){
 				$text = $value[1];
 			}

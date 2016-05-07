@@ -27,6 +27,7 @@ class SerialAdaptor(object):
 				try:
 					return self.connection.readline().decode('utf-8')
 				except serial.SerialTimeoutException, serial.SerialException:
+					print 'read exception'
 					return False
 
 	def connect(self):
@@ -37,6 +38,7 @@ class SerialAdaptor(object):
 		while (not self.connection) and portIndex < len(self.config['ports']):
 			try:
 				self.connection = serial.Serial(self.config['ports'][portIndex], self.config['baudrate'], timeout=0.1)
+				print 'connected'
 				return True
 			except serial.SerialException:
 				portIndex += 1

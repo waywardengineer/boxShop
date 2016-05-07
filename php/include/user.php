@@ -2,7 +2,7 @@
 // need to modify this to mostly be structured around user id like the other stuff
 
 
-if ($auth!='auth') {die();};
+if ($authkey!='boxshop94124') {die();};
 include("database.php");
 include("mailer.php");
 include("form.php");

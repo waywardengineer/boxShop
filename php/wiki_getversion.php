@@ -1,5 +1,5 @@
 <?php
-$auth='auth';
+$authkey='boxshop94124';
 include('include/user.php');
 $id=intval($_GET['id']);
 if ($user->isTrusted()){

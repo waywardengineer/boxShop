@@ -1,5 +1,5 @@
 <?php
-if ($auth!='auth') {die();};
+if ($authkey!='boxshop94124') {die();};
 // need to modify this to mostly be structured around user id like the other stuff
 
 
@@ -25,8 +25,8 @@ class MySQLDB
    /* Class constructor */
    function MySQLDB(){
       /* Make connection to database */
-      $this->connection = mysql_connect(DB_SERVER, DB_USER, DB_PASS) or die(mysqlErroror());
-      mysql_select_db(DB_NAME, $this->connection) or die(mysqlErroror());
+      $this->connection = mysql_connect(DB_SERVER, DB_USER, DB_PASS) or die(mysqlError());
+      mysql_select_db(DB_NAME, $this->connection) or die(mysqlError());
       
    }
 

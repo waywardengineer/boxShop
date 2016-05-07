@@ -1,8 +1,7 @@
 <?php
-$auth='auth';
+$authkey='boxshop94124';
 include("include/common.php");
-$html = new Template('templates/main.tpl', 'templates/forgotpass.tpl');
-$html->createNav();
+$html->addSubTemplate('templates/forgotpass.tpl');
 if(isset($_SESSION['forgotpass'])){
    /**
     * New password was generated for user and sent to user's
@@ -21,7 +20,6 @@ if(isset($_SESSION['forgotpass'])){
    unset($_SESSION['forgotpass']);
 }
 else{
-	echo 'fucker';
 	$msg="<p><strong>Forgot Password</strong></p><p>A new password will be generated for you and sent to the email address associated with your account, all you have to do is enter your username.</p>";
 	$msg.= $form->error("user");
 	$html->set('formUser', $form->value("user"));

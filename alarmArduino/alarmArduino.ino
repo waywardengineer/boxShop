@@ -17,7 +17,7 @@
  * by hitting '#', too, to flush the buffer of any password someone was
  * prevriously trying to enter.
  */
-#define HIGHILLUMLEDTIMEOUT 5000
+#define HIGHILLUMLEDTIMEOUT 10000
 #define WAITCOUNTDOWNLENGTH 30000
 #define ALARMCODECOUNTDOWNLENGTH 10000 //length of time to flash alarm code after alarm has been turned off
 #define ALARMSTAGE1LENGTH 20000
@@ -139,7 +139,7 @@ unsigned long deBounceTimeOut[NUMDEBOUNCEDINPUTS];
 int incomingByte;
 
 void setup() {
-  //Serial.begin(9600);
+  Serial.begin(9600);
   //Serial1.begin(9600);
   pinMode (oAlarmBell,OUTPUT);
   pinMode (oAlarmScreech,OUTPUT);
@@ -215,7 +215,7 @@ void loop() {
   switch(mode){
   case 1: //not armed
     if (digitalRead(iTimerSwitch)){
-      changeMode(3);
+      //changeMode(3);
     }
     checkSensors(false);
     if (digitalRead(iDoorBell)){
@@ -228,7 +228,7 @@ void loop() {
   case 2: //armed
     digitalWrite(oArmedLed, blinkLeds(1000, 1000, 0, 1));
     if (!digitalRead(iTimerSwitch)){//timer
-      changeMode(1);
+      //changeMode(1);
     }
     if (digitalRead(iExitButton) || kpGoodPass){//exitbtn
       changeMode(3);
@@ -246,7 +246,7 @@ void loop() {
       changeMode(2);
     }
     if (!digitalRead(iTimerSwitch)){
-      changeMode(1);
+      //changeMode(1);
     }
 
     
@@ -319,7 +319,7 @@ void loop() {
     webPollTimeOut = upTime + WEBPOLLINTERVAL;
   }
   kpGoodPass = false;
-  /*while (Serial.available() > 0) {// pass messages from usb line to rs485 and decide if it's a message the arduino has to do something about
+  while (Serial.available() > 0) {// pass messages from usb line to rs485 and decide if it's a message the arduino has to do something about
     // read the incoming byte:
     incomingByte = Serial.read();
     if (incomingByte == '.'){
@@ -345,7 +345,7 @@ void loop() {
   }*/
   
   
-  /*if (upTime > serBufferTimeOut){
+  if (upTime > serBufferTimeOut){
     if (serBuffer != String("")){
       serBuffer += String(".");
       Serial.print(serBuffer);
@@ -357,7 +357,7 @@ void loop() {
       serBuffer1 = String("");
       serBufferTimeOut = upTime + SERBUFFERSENDSPACING;
     }
-  }  */ 
+  } 
 }
 void processCommand(){
   switch (incomingComponentId){
@@ -371,12 +371,7 @@ void processCommand(){
       codeCheckTimeOut = 0;
       break;
     case 'M':
-      if (incomingAction == '3' && mode == 4){
-        changeMode(3);
-      }
-      if (incomingAction == '4'){
-        changeMode(4);
-      }
+      changeMode(incomingAction - '0');
       break;    
     case 'R':
       serBuffer = String(".M") + String(mode);

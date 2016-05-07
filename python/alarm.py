@@ -14,17 +14,19 @@ class HttpRequest(threading.Thread):
 	def __init__(self, route, data, method, callback=None):
 		self.__dict__.update(locals())
 		threading.Thread.__init__(self)
+		self.start()
 
 	def run(self):
 		data = self.data.copy()
 		data['token'] = config['apiToken']
 		url = config['apiUrlRoot'] + self.route
 		result = None
+		print url
 		if self.method == 'post':
 			headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 			try:
 				result = requests.post(url, data=json.dumps(data), headers=headers)
-				print result
+				print result.content
 			except Exception as e:
 				print e.message
 		if self.method == 'get':
@@ -46,9 +48,10 @@ class Code(object):
 			return self.data[item]
 
 	def check(self, keypadID, currentTimestamp, code):
+		print self.code
 		if keypadID not in self.keypads:
 			return False
-		if self.startDate and not (self.startDate < currentTimestamp < self.endDate):
+		if not self.startDate == "0" and not (self.startDate < currentTimestamp < self.endDate):
 			return False
 		if not self.regex.match(code):
 			return False
@@ -74,10 +77,14 @@ def checkOnlineCodes(_):
 
 def handleCodeRequestResult(result):
 	global codeHash
+	if not result:
+		return
 	try:
 		result = result.json()
 	except Exception as e:
 		print e.message
+		return
+	if not result:
 		return
 	newHash = hashlib.sha256(result['codesJson']).hexdigest()
 	if not newHash == result['hash']:
@@ -100,7 +107,6 @@ codeHash = hashlib.sha256(codeFile).hexdigest()
 processCodeFile(codeFile)
 twilioClient = TwilioRestClient(config['twilioAccountSid'], config['twilioAuthToken'])
 callTimeOut = 0
-armedState = False
 systemStatus = {
 	'M': '0', #mode
 	'D': '0', #yard door
@@ -134,6 +140,7 @@ while True:
 						if code.check(component, timestamp, componentStatus):
 							responseCode = '2'
 							systemStatus['U'] = code.user
+							continue
 					sendSerialData(serialAdaptorId, {keyPadIds[component]: responseCode})
 					systemStatus[keyPadIds[component]] = responseCode
 	if eventHappened:
@@ -155,12 +162,10 @@ while True:
 			callTimeOut = 0
 	now = datetime.datetime.now()
 	if config['offHour'] < now.hour < config['onHour']:
-		if armedState:
+		if systemStatus['M'] in ['2', '3']:
 			sendSerialData('main', {'M': '1'})
-			armedState = False
 	else:
-		if not armedState:
+		if systemStatus['M'] in ['1']:
 			sendSerialData('main', {'M': '3'})
-			armedState = True
 
 	time.sleep(0.2)

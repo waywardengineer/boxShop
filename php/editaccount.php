@@ -1,27 +1,14 @@
 <?php 
 
-$auth='auth';
+$authkey='boxshop94124';
 include("include/common.php");
-$html = new Template('templates/main.tpl');
-$html->createNav();
-
 if (!$user->isTrusted()){
 	header("Location: index.php");
 	die();
 }
-$welcome_msg = "Welcome, $user->username";
-$showsections = array('page_edit', 'calscripts', 'page_admin2');
-$toplink['Home'] = 'index.php';
-if($user->isAdmin()){
-	$toplink['Admin']= 'admin/admin.php';
-}
+$showsections = array();
+$html->addSubTemplate('templates/editaccount.tpl');
 if ($form->numErrors == 0){
-	$q="SELECT code FROM codes WHERE UID = " .  $user->uid . " AND startDate = 0;";
-	$result=$database->query($q);
-	$row = @mysql_fetch_array($result);
-	if ($row){
-		$form->setValue('userCode', $row['code']);
-	}
 	$q="SELECT email FROM users WHERE UID = " .  $user->uid . ";";
 	//echo $q;
 	$result=$database->query($q);
@@ -44,7 +31,4 @@ foreach($formItems as $item){
 	$html->set($str, $form->error($item));
 
 }
-$toplink['Logout'] = 'process.php';
-$html->makeLinkBars($toplink, 'toplinks');
-$html->set('welcome', $welcome_msg);
 echo $html->doOutput($showsections);

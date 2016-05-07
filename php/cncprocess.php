@@ -1,20 +1,23 @@
 <?php
-$auth='auth';
+$authkey='boxshop94124';
 
 include ('include/user.php');
 if (!$user->isTrusted()){die();}
 if (isset($_POST)){
+	//print_r($_POST);
 	$id = false;
 	$processedArray = array();
 	foreach ($_POST as $k=>$v){
-		$processedArray[mysql_real_escape_string($k)] =  mysql_real_escape_string($v);
+		$processedArray[mysql_real_escape_string($k)] =  $v?mysql_real_escape_string($v):'0';
 	}
 	$notes = array_pop($processedArray);
+	$notes = $notes == '0'?'':$notes;
 	$result = getIDOfRecord();
 	if ($result['id']){
 		$id = $result['id'];
 		if ($result['notesChanged']){
 			$query = 'UPDATE cnc_settings SET notes = "' . mysql_real_escape_string($_POST['notes']) . '" WHERE ID = ' . $id . ' LIMIT 1';
+			//echo $query;
 			$database->query($query);
 		}
 	}
@@ -22,14 +25,16 @@ if (isset($_POST)){
 		$keys = implode(', ', array_keys($processedArray));
 		$values = implode(', ', $processedArray);
 		$query = "INSERT INTO cnc_settings($keys, notes) VALUES ($values, '$notes')";
+		//echo $query;
 		$database->query($query);
 		$result = getIDOfRecord();
+		//echo $result;
 		$id = $result['id'];
-		
 	}
 	if ($id){
 		$query = "INSERT INTO cnc_uses(settingID, UID, timestamp) VALUES ($id, {$user->uid}, " . time() . ')';
-		echo $query;
+		//echo $query;
+
 		$database->query($query);
 	}
 	header("Location: cnc.php");
@@ -43,7 +48,7 @@ function getIDOfRecord(){
 	$notesChanged = false;
 	foreach($processedArray as $k=>$v){
 		$query .= $first?'':' AND ';
-		$query .= mysql_real_escape_string($k) . '=' . mysql_real_escape_string($v);
+		$query .= $k . '=' . $v;
 		$first = false;
 	}
 	$result = $database->query($query);

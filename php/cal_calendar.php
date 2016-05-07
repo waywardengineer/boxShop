@@ -47,7 +47,7 @@ function makeCalendar(){
 	$calHTML=new eventTemplate('calendar');
 	$startday=date("w",mktime(0,0,0,$month,1,$year));
 	$dayloop=1;
-	$calSizeParams = array('eventMaxHeight'=>60, 'dayHeight'=>78, 'dayWidth'=>67, 'dayHeadingHeight'=>25, 'hSpacing'=>3, 'vSpacing'=>6);
+	$calSizeParams = array('eventMaxHeight'=>60, 'dayHeight'=>78, 'dayWidth'=>78, 'dayHeadingHeight'=>25, 'hSpacing'=>0, 'vSpacing'=>6);
 	$top=0;
 	$left=0;
 	$days=array('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');

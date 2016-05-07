@@ -1,0 +1,183 @@
+@charset "utf-8";
+/* CSS Document */
+
+h1,h2,h3,h4,h5,h6 {
+	font-family:'gill sans','gill sans mt','gill sans mt pro','century gothic',corbel,sans-serif;
+	font-weight:normal;
+	text-transform:uppercase;
+	letter-spacing:.05em;
+	text-rendering: optimizeLegibility}
+h1 {font-size:1em; line-height:1; margin:1em 0 .333em;}
+h2 {font-size:2.4em; line-height:1; margin:1em 0 .25em;}
+h3 {font-size:2.1em; line-height:1.143; margin:1.143em 0 .286em;}
+h4 {font-size:1.8em; line-height:1.333; margin:1.333em 0 .333em; display:block;
+border-style:solid;
+border-color:#333333;
+border-width: 0px 0px 1px 0px;
+}
+h5 {font-size:1.6em; margin-top:1.5em 0 .375em;}
+h4, h5 {letter-spacing:.1em;}
+h1 + h2, h1 + h3, h1 + h4, h1 + h5, h1 + h6, h2 + h3, h2 + h4, h2 + h5, h2 + h6, h3 + h4, h3 + h5, h3 + h6, h4 + h5, h4 + h5, h5 + h6 {
+	margin-top:0;
+}
+
+
+#header {
+
+	margin-bottom:2em;
+	padding:2em 3em 0em 3em;
+	color:#fff;
+	position:relative;
+	top:0px;
+	left:0px;
+	width:100%;
+	z-index:2;
+	text-align:left;
+}
+#header h1, #header h3{color:#fff; text-decoration:none; line-height:1; margin:0;}
+.welcome a, .welcome a:link, .welcome a:visited, .welcome a:active{
+	color:#fff;
+	text-transform: uppercase;
+	font: bold 10px/20px Arial, Helvetica;
+	text-decoration: none;
+	text-shadow: 0 1px 0 #000;
+	margin-left:20px;
+
+}
+	
+
+
+.listcolumn {
+	display:inline-block;
+	text-align:left;
+}
+.formRow {
+	margin:auto;
+	width:400px;
+	height:30px;
+	position:relative;
+}
+
+.admin_selected{
+	background-color:#CCC;
+}
+.alarmstatus{
+	width:100%;
+	font-size:22px;
+}
+.contentContainer{
+	position:relative;
+	width:80%;
+	text-align:left;
+	margin:auto;
+}
+
+.contentheading {
+	font-size:22px;
+	font-weight:bold;
+}
+.footerlinks {
+
+	padding:5px;
+
+}
+.addpass{
+
+	width:100%;
+
+	margin-top:0px;
+}
+
+
+
+.eventlogbox{
+	width:100%;
+
+}
+
+.infobox_header {
+
+	width:100%;
+	height:20px;
+
+
+}
+.infobox_info {
+
+	width:100%;
+
+
+	
+}
+
+#eventlogcontainer {
+	position:relative;
+	margin:auto;
+	margin-top:20px;
+	height:280px;
+	width:850px;
+	overflow:hidden;
+	border-style:solid;
+	border-width:1px;
+	border-color:#666;
+	-moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -khtml-border-radius: 4px;
+    border-radius: 4px;
+}
+
+
+
+.barGraphBar, .barGraphBarSideways {
+	position:absolute;
+	border-style:solid;
+	border-width:1px;
+	border-color:#F60;
+	background-color:#D3D6FF;
+	font-size:10px;
+	padding-top:3px;
+}
+.barGraphBarSideways span{
+	display:block;
+	-webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    writing-mode: tb-rl;
+}
+.barGraphLabel {
+	display:block;
+	width:50px;
+	text-align:left;
+	position:absolute;
+	font-size:12px;
+	top:260px;	
+
+
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    writing-mode: tb-rl;
+}
+.cncRecordSmallInput {
+	width:60px;
+}
+.clear{
+	visibility: hidden;
+	display: block;
+	font-size: 0;
+	content: " ";
+	clear: both;
+	height: 0;
+}
+.row_selected {
+	background-color:#D3D6FF !important;
+	font-weight:bold;
+
+}
+.dataForm {
+	background-color:#D3D6FF;
+}
+	
+
+
+

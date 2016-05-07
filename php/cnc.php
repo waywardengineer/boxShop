@@ -1,36 +1,37 @@
 <?php
-$auth='auth';
+$authkey='boxshop94124';
 include("include/common.php");
-$html = new Template('templates/main.tpl', 'templates/cnc.tpl');
-$html->createNav();
+if (!$user->isTrusted()){
+	header("Location: index.php");
+	die();
+}
+$html->addSubTemplate('templates/cnc.tpl');
 include("include/alarm.php");
-if($user->logged_in){
-	$welcome_msg = "Welcome, $user->username";
-}
-else {
-	$welcome_msg="Hello, guest";
-	$html->set('formLoginUser', $form->value("user"));
-	$html->set('formLoginUserError', $form->error("user"));
-	$html->set('formLoginPass', $form->value("pass"));
-	$html->set('formLoginPassError', $form->error("pass"));
-	$showsections[]='login';
-}
 if($user->isTrusted()){
 		
 		
-	$resultsArray = array(array("materialID", "thicknessID", "Material", "Thickness", "Amperage", "Voltage", "Feedrate", "Pierce Height", "Initial Cut Height", "Pierce Delay", "PSI", "Kerf", "Notes", "Done by"));
+	$resultsArray = array(array("materialID", "thicknessID", "Material", "Thickness", "Amperage", "Voltage", "Feedrate", "Pierce Height", "Initial Cut Height", "Pierce Delay", "PSI", "Kerf", "Notes", "Done by", "Date"));
 	$query="SELECT cnc_settings.ID AS ID, materialID, thicknessID, material, thickness, amps, volts, feedrate, pierceHeight, initCutHeight, pierceDelay, PSI, kerf, notes FROM cnc_settings JOIN cnc_materials ON cnc_materials.ID = materialID JOIN cnc_thicknesses ON cnc_thicknesses.ID = thicknessID";
 	$result = $database->query($query);
 	while ($row = @mysql_fetch_array($result, MYSQL_NUM)){
 		$processedRow = $row;
-		
-		$query = "SELECT DISTINCT username FROM users JOIN cnc_uses USING (UID) WHERE settingID = " . array_shift($processedRow) . " LIMIT 5";
+		$settingId = array_shift($processedRow);
+		$query = "SELECT DISTINCT username FROM users JOIN cnc_uses USING (UID) WHERE settingID = $settingId LIMIT 5";
 		$result2 = $database->query($query);
-		$userNames='';
+		$txt='';
 		while($row2 = @mysql_fetch_array($result2)){
-			$userNames .= (($userNames == '')?'':', ') . $row2['username'];
+			$txt .= (($txt == '')?'':', ') . $row2['username'];
 		}
-		$processedRow[] = $userNames;
+		$processedRow[] = $txt;
+		$txt = '';
+		$query = "SELECT timestamp FROM cnc_uses WHERE settingID = $settingId ORDER BY timestamp DESC LIMIT 1";
+		$result2 = $database->query($query);
+		if ($result2) {
+			$row2 = @mysql_fetch_array($result2);
+			$txt = date('M j Y', $row2['timestamp']);
+		}
+
+		$processedRow[] = $txt;
 		$resultsArray[] = $processedRow;
 	}
 	$html->set('cncLog', $html->makeTable($resultsArray, 'CNC Logs', true, false, 'cncLogs'));
@@ -49,6 +50,5 @@ if($user->isTrusted()){
 	}
 	$html->set('thicknessOptions', $html->makeFormOptions($arr));
 }
-$html->set('msg', $welcome_msg);
-echo $html->doOutput(array('cncscripts'));
+echo $html->doOutput();
 

@@ -1,9 +1,6 @@
 <?php
-$auth='auth';
+$authkey='boxshop94124';
 include("include/common.php");
-$html = new Template('templates/main.tpl');
-$html->createNav();
-
 include("include/templateAddons.php");
 
 if (!$user->isTrusted()){
@@ -35,7 +32,7 @@ $subTemplate->setMulti(array('id'=>$id, 'l'=>$l, 'content'=>$row['txt'], 'tabs'=
 
 
 $output = $subTemplate->doOutput();
-	
+$html->set('welcome', $welcome_msg);
 $html->set("content", $output);
 echo $html->doOutput(array('wikiscripts', 'wikiform'));
 
