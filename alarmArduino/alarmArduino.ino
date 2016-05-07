@@ -27,14 +27,9 @@
 #define WEBPOLLINTERVAL 30*60000
 #define SERBUFFERSENDSPACING 500
 
-//#define KPPASSWORDLEN 11 //number of chars in a password including the #
-//char passwords[][KPPASSWORDLEN] = {{'7','4','6','7', '2', '6', '9', '9', '5', '1', '#'}};
 
 #define KPPASSWORDLEN 6 //number of chars in a password including the #
 char passwords[][KPPASSWORDLEN] = {
-    {'5', '6', '8', '8', '7', '#'},
-    {'7', '3', '3', '7', '9', '#'},
-    {'4', '3', '5', '9', '9', '#'}
 };
 
 #include "Keypad.h"

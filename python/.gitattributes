@@ -1,1 +1,2 @@
 config.json filter=git-crypt diff=git-crypt
+codes.json filter=git-crypt diff=git-crypt
