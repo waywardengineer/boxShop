@@ -49,7 +49,7 @@ if ($user->isTrusted()){
 		
 			$q="INSERT INTO codes(UID,startDate, endDate, notes, code, keyPadK, keyPadL) VALUES ('" . $user->uid . "', " . $codeStartDate . ", " . $codeEndDate . ", '" . @mysql_real_escape_string($notes) . "', '" . $code . "', 1, 0)";
 			$database->query($q);
-			$guestcodes->doCodeSQLLog($q);
+			$guestcodes->updateCodeHash();
 
 		}
 		else {
@@ -77,7 +77,7 @@ if ($user->isTrusted()){
 		if ($hasAuth){
 			$q="DELETE FROM codes WHERE ID=$id LIMIT 1";
 			$database->query($q);
-			$guestcodes->doCodeSQLLog($q);
+			$guestcodes->updateCodeHash();
 		}
 	}
 	else if ($_POST['doWhat']=='changePerm'){

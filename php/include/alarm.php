@@ -145,17 +145,21 @@ class Guestcodes {
 				else {
 					$q = "INSERT INTO codes (UID, startDate, notes, code, keypadK, keypadL) VALUES ($uid, 0, '', '" . $codeResult['code'] . "', 1, 0);";
 				}
+				$this->updateCodeHash();
 			}
 			$database->query($q);
-			$compiledCodes = ($this->compileCodeJson());
-			$codeHash = hash('sha256', $compiledCodes);
-			$q = "UPDATE settings SET data = '" . $codeHash . "' WHERE setting = 'currentCodeHash';";
-			$database->query($q);
-			
 			return 1;
 		}
 				
 	}
+	public function updateCodeHash(){
+		global $database;
+		$compiledCodes = ($this->compileCodeJson());
+		$codeHash = hash('sha256', $compiledCodes);
+		$q = "UPDATE settings SET data = '" . $codeHash . "' WHERE setting = 'currentCodeHash';";
+		$database->query($q);
+	}
+    
 	public function getGuestCodes($uid){
 		global $database;
 		$q="SELECT codes.ID, codes.UID, codes.startDate, codes.notes, codes.code, users.username FROM codes INNER JOIN users ON codes.UID = users.UID WHERE codes.UID = " .  $uid . " AND codes.endDate >= " . $this->startOfToday() . " ORDER BY codes.startDate ASC;";
