@@ -38,10 +38,14 @@ class HttpRequest(threading.Thread):
 		if result and self.callback:
 			self.callback(result)
 
+
 class Code(object):
 	def __init__(self, data):
 		self.data = data
 		self.regex = re.compile(''.join([s + '.*' for s in data['code']]))
+		for item in ['startDate', 'endDate']:
+			if data[item]:
+				self.data[item] = int(data[item])
 
 	def __getattr__(self, item):
 		if item in ['user', 'code', 'startDate', 'endDate', 'keypads']:
@@ -50,11 +54,12 @@ class Code(object):
 	def check(self, keypadID, currentTimestamp, code):
 		if keypadID not in self.keypads:
 			return False
-		if not self.startDate == "0" and not (self.startDate < currentTimestamp < self.endDate):
+		if not self.startDate == 0 and not (self.startDate < currentTimestamp < self.endDate):
 			return False
 		if not self.regex.match(code):
 			return False
 		return True
+
 
 def processCodeFile(codeFile):
 	global codes
@@ -77,6 +82,7 @@ def checkOnlineCodes(_):
 		return
 	nextCodeCheckAllowedTime = now + datetime.timedelta(seconds=30)
 	HttpRequest('codes.php', {'hash': codeHash}, 'get', handleCodeRequestResult)
+
 
 def handleCodeRequestResult(result):
 	global codeHash
