@@ -99,6 +99,7 @@ def handleCodeRequestResult(result):
 	if not newHash == result['hash']:
 		print "hash mismatch"
 		return
+	print 'Code update downloaded'
 	codeHash = newHash
 	with open(os.path.join(programPath, 'codes.json'), 'w') as f:
 		f.write(result['codesJson'])

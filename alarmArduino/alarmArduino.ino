@@ -19,7 +19,7 @@
  */
 #define HIGHILLUMLEDTIMEOUT 10000
 #define WAITCOUNTDOWNLENGTH 30000
-#define ALARMCODECOUNTDOWNLENGTH 10000 //length of time to flash alarm code after alarm has been turned off
+#define ALARMCODECOUNTDOWNLENGTH 5000 //length of time to flash alarm code after alarm has been turned off
 #define ALARMSTAGE1LENGTH 20000
 #define ALARMSTAGE2LENGTH 75000
 #define KPCODECHECKDELAY 5000
@@ -101,10 +101,10 @@ const byte iTimerSwitch = 31;
 const byte iExitButton = 32;
 const byte iDoorBell = 33;
 
-#define NUMALARMSENSEINPUTS 1
+#define NUMALARMSENSEINPUTS 2
 
-int alarmInputs[NUMALARMSENSEINPUTS][2] = {{iDoorSwitch, 500}};//, {iGateSwitch, 1500}, {iBeamSensor, 1500}};
-char alarmInputSerialCodes[NUMALARMSENSEINPUTS][2] = {{'D', '0'}};//, {'G', '0'}, {'B', '0'}};
+int alarmInputs[NUMALARMSENSEINPUTS][2] = {{iDoorSwitch, 500}, {iGateSwitch, 1500}};//, {iBeamSensor, 1500}};
+char alarmInputSerialCodes[NUMALARMSENSEINPUTS][2] = {{'D', '0'}, {'G', '0'}};//, {'B', '0'}};
 int beepRepeatCount;
 int mode;
 int sensorTripped;

@@ -145,9 +145,9 @@ class Guestcodes {
 				else {
 					$q = "INSERT INTO codes (UID, startDate, notes, code, keypadK, keypadL) VALUES ($uid, 0, '', '" . $codeResult['code'] . "', 1, 0);";
 				}
-				$this->updateCodeHash();
 			}
 			$database->query($q);
+			$this->updateCodeHash();
 			return 1;
 		}
 				
