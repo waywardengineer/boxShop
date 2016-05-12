@@ -8,7 +8,6 @@
 #define KPMAXTRIES 6 // max number of failed tries before timeout happens
 #define KPMAXTRYTIMEINT (30000) //time it takes for 1 failed password attempt to be deducted from the total; the timeout length is 3 times this
 
-#define KPNUMPASSWORDS 3 //number of passwords- if i were better at array stuff we probably could ditch this
 #define LATCHDELAY 6000
 /*
  * Passwords must end in '#'
@@ -28,11 +27,8 @@
 #define SERBUFFERSENDSPACING 500
 
 
-#define KPPASSWORDLEN 6 //number of chars in a password including the #
-char passwords[][KPPASSWORDLEN] = {
-};
-
 #include "Keypad.h"
+#include "permCodes.h"
 
 const byte rows = 4;
 const byte cols = 3;
