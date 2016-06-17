@@ -96,11 +96,13 @@ const byte iOffSwitch = 30;
 const byte iTimerSwitch = 31;
 const byte iExitButton = 32;
 const byte iDoorBell = 33;
+const byte iBureaucratGateSwitch = 34;
 
-#define NUMALARMSENSEINPUTS 2
 
-int alarmInputs[NUMALARMSENSEINPUTS][2] = {{iDoorSwitch, 500}, {iGateSwitch, 1500}};//, {iBeamSensor, 1500}};
-char alarmInputSerialCodes[NUMALARMSENSEINPUTS][2] = {{'D', '0'}, {'G', '0'}};//, {'B', '0'}};
+#define NUMALARMSENSEINPUTS 3
+
+int alarmInputs[NUMALARMSENSEINPUTS][2] = {{iDoorSwitch, 500}, {iGateSwitch, 1500}, {iBureaucratGateSwitch, 1000}};//, {iBeamSensor, 1500}};
+char alarmInputSerialCodes[NUMALARMSENSEINPUTS][2] = {{'D', '0'}, {'G', '0'}, {'H', '0'}};//, {'B', '0'}};
 int beepRepeatCount;
 int mode;
 int sensorTripped;
@@ -148,6 +150,7 @@ void setup() {
   pinMode (oDoorLatch,OUTPUT);
   pinMode (oBeep,OUTPUT);
 
+  pinMode (iBureaucratGateSwitch,INPUT);
   pinMode (iGateSwitch,INPUT);
   pinMode (iDoorSwitch,INPUT);
   pinMode (iBeamSensor,INPUT);
