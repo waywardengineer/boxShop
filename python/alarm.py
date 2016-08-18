@@ -126,13 +126,20 @@ systemStatus = {
 	'W': '0', #wire sensor
 	'K': '0', #yard keypad
 	'L': '0', #shop keypad
-	'U': '0'  #user id if valid code
+	'U': '0',  #user id if valid code
+	'T': None #what triggered alarm mode
+}
+alarmTriggerNames = {
+	'0': 'Yard Door',
+	'1': 'Main Gate',
+	'2': 'Side Gate'
 }
 keyPadIds = {'K': 'D', 'L': 'E'}
 
 serialAdaptors = {serialLine: SerialAdaptor(config['serialLines'][serialLine]) for serialLine in config['serialLines']}
 nextCodeCheckAllowedTime = None
 smsTime = None
+timeAlarmTriggered = None
 while True:
 	now = datetime.datetime.now()
 	eventHappened = False
@@ -162,13 +169,19 @@ while True:
 	if systemStatus['M'] == '4':
 		if not smsTime:
 			smsTime = now + datetime.timedelta(minutes=15)
+			timeAlarmTriggered = now
 	else:
 		smsTime = None
 	if smsTime:
 		if now > smsTime:
+			if systemStatus['T']:
+				sensorName = 'by ' + systemStatus['T']
+			else:
+				sensorName = ''
+			alarmMessage = 'Boxahop alarm triggered{} at {%b %d %H:%M}'.format(sensorName, timeAlarmTriggered)
 			for name, phoneNumber in config['phoneNumbers'].items():
 				print 'Texting' + name
-				message = twilioClient.messages.create(to=phoneNumber, from_=config['fromNumber'], body="Boxshop Alarm!")
+				message = twilioClient.messages.create(to=phoneNumber, from_=config['fromNumber'], body=alarmMessage)
 			smsTime = now + datetime.timedelta(minutes=15)
 	if config['offHour'] <= now.hour < config['onHour']:
 		if systemStatus['M'] in ['2', '3']:

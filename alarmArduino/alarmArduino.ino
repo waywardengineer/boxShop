@@ -34,16 +34,16 @@ const byte rows = 4;
 const byte cols = 3;
 char keys[rows][cols] = {
   {
-    '1','2','3'  }
+	'1','2','3'  }
   ,
   {
-    '4','5','6'  }
+	'4','5','6'  }
   ,
   {
-    '7','8','9'  }
+	'7','8','9'  }
   ,
   {
-    '*','0','#'  }
+	'*','0','#'  }
 };
 int serialCharCount;
 byte rowPins[rows] = {
@@ -123,9 +123,9 @@ byte kpGoodPass = false;
 int i;
 int beepTypes[2][4] = {
   {
-    3000, 100, 150, 3  }
+	3000, 100, 150, 3  }
   , {
-    4000, 500, 1000, 15  }
+	4000, 500, 1000, 15  }
 }; //frequency, ontime, cycletime, repeat
 
 #define NUMDEBOUNCEDINPUTS 2
@@ -169,218 +169,218 @@ void loop() {
   lastUpTime = upTime;
   upTime = millis();
   if (upTime < lastUpTime) { // we wrapped!  special case.
-    doWrap();
+	doWrap();
   } 
-    // keypad stuff
+	// keypad stuff
   if (kpBuffer[0] && upTime - kpLastKeyTime > KPTIMEOUT) {
-    kpClearBuffer();
+	kpClearBuffer();
   }
   if (kpFailCount > 0 && upTime > kpFailClearTime){
-    if (kpInTimeOut && kpFailCount < KPMAXTRIES){  
-      kpInTimeOut = false;
-    }
-    kpFailCount--;
-    kpFailClearTime = upTime + KPMAXTRYTIMEINT;
+	if (kpInTimeOut && kpFailCount < KPMAXTRIES){  
+	  kpInTimeOut = false;
+	}
+	kpFailCount--;
+	kpFailClearTime = upTime + KPMAXTRYTIMEINT;
   }
   kpLastKey = key;
   key = keypad.getKey();
   if (key != NO_KEY) {
-    highIllumLedTimeOut = upTime + HIGHILLUMLEDTIMEOUT;
-    digitalWrite(oHighIllumLed, HIGH);
-    activeTimeOut = true;
-    if (kpLastKey != key) {
-      kpLastKeyTime = upTime;
-      if (!kpInTimeOut){
-        
-        if (kpBufferLen <= sizeof(kpBuffer) - 1){
-          kpBuffer[kpBufferLen++] = key;
-          tone(oBeep, 3000, 50);
-        }  
-        if (key == '#') {
-          kpCheckPassword();
-          kpClearBuffer();
-        }
-        if (key == '*') {
-          checkSensors(true);
-        }
-      }
-      else{
-        tone(oBeep, 3000, 1000); //long beep to say "i'm not listening anymore, you fool!"
-      }       
-    }
+	highIllumLedTimeOut = upTime + HIGHILLUMLEDTIMEOUT;
+	digitalWrite(oHighIllumLed, HIGH);
+	activeTimeOut = true;
+	if (kpLastKey != key) {
+	  kpLastKeyTime = upTime;
+	  if (!kpInTimeOut){
+		
+		if (kpBufferLen <= sizeof(kpBuffer) - 1){
+		  kpBuffer[kpBufferLen++] = key;
+		  tone(oBeep, 3000, 50);
+		}  
+		if (key == '#') {
+		  kpCheckPassword();
+		  kpClearBuffer();
+		}
+		if (key == '*') {
+		  checkSensors(true);
+		}
+	  }
+	  else{
+		tone(oBeep, 3000, 1000); //long beep to say "i'm not listening anymore, you fool!"
+	  }       
+	}
   }
 
   // alarm status stuff
   switch(mode){
   case 1: //not armed
-    if (digitalRead(iTimerSwitch)){
-      //changeMode(3);
-    }
-    checkSensors(false);
-    if (digitalRead(iDoorBell)){
-      digitalWrite(oAlarmBell, HIGH);
-    }
-    else {
-      digitalWrite(oAlarmBell, LOW);
-    }
-    break;
+	if (digitalRead(iTimerSwitch)){
+	  //changeMode(3);
+	}
+	checkSensors(false);
+	if (digitalRead(iDoorBell)){
+	  digitalWrite(oAlarmBell, HIGH);
+	}
+	else {
+	  digitalWrite(oAlarmBell, LOW);
+	}
+	break;
   case 2: //armed
-    digitalWrite(oArmedLed, blinkLeds(1000, 1000, 0, 1));
-    if (!digitalRead(iTimerSwitch)){//timer
-      //changeMode(1);
-    }
-    if (digitalRead(iExitButton) || kpGoodPass){//exitbtn
-      changeMode(3);
-    }
-    if (!checkSensors(false) && alarmTimeOut <= upTime){
-      changeMode(4);
-    }
-    break;
+	digitalWrite(oArmedLed, blinkLeds(1000, 1000, 0, 1));
+	if (!digitalRead(iTimerSwitch)){//timer
+	  //changeMode(1);
+	}
+	if (digitalRead(iExitButton) || kpGoodPass){//exitbtn
+	  changeMode(3);
+	}
+	if (!checkSensors(false) && alarmTimeOut <= upTime){
+	  changeMode(4);
+	}
+	break;
   case 3: //wait  
-    digitalWrite(oWaitLed, blinkLeds(150, 1000, 200, (sensorTripped + 1)));
-    if(!checkSensors(false) || digitalRead(iExitButton) || kpGoodPass){
-      modeCountDown = upTime + WAITCOUNTDOWNLENGTH;
-    }
-    if (modeCountDown < upTime) {
-      changeMode(2);
-    }
-    if (!digitalRead(iTimerSwitch)){
-      //changeMode(1);
-    }
+	digitalWrite(oWaitLed, blinkLeds(150, 1000, 200, (sensorTripped + 1)));
+	if(!checkSensors(false) || digitalRead(iExitButton) || kpGoodPass){
+	  modeCountDown = upTime + WAITCOUNTDOWNLENGTH;
+	}
+	if (modeCountDown < upTime) {
+	  changeMode(2);
+	}
+	if (!digitalRead(iTimerSwitch)){
+	  //changeMode(1);
+	}
 
-    
-    break;
+	
+	break;
   case 4: //alarm
-    if (blinkLeds(500, 500, 0, 1)){
-      digitalWrite(oIllumLed, HIGH);
-      digitalWrite(oArmedLed, LOW);
-    }
-    else{
-      digitalWrite(oIllumLed, LOW);
-      digitalWrite(oArmedLed, HIGH);
-    }
-    if (alarmStage == 0 && modeCountDown < upTime){
-      digitalWrite (oAlarmBell, HIGH);
-      alarmStage++;
-      modeCountDown = upTime + ALARMSTAGE2LENGTH;
-    }
-    if (alarmStage == 1 && modeCountDown < upTime){
-      digitalWrite (oAlarmScreech, HIGH);
-      alarmStage++;
-    }
-    if (upTime > webPollTimeOut){
-      serBuffer += String(".M4");
-      webPollTimeOut = upTime + ALARMWEBPOLLINTERVAL;
-    }
-    if (digitalRead(iOffSwitch) || kpGoodPass){
-      changeMode(5);
-    }
-    break;
+	if (blinkLeds(500, 500, 0, 1)){
+	  digitalWrite(oIllumLed, HIGH);
+	  digitalWrite(oArmedLed, LOW);
+	}
+	else{
+	  digitalWrite(oIllumLed, LOW);
+	  digitalWrite(oArmedLed, HIGH);
+	}
+	if (alarmStage == 0 && modeCountDown < upTime){
+	  digitalWrite (oAlarmBell, HIGH);
+	  alarmStage++;
+	  modeCountDown = upTime + ALARMSTAGE2LENGTH;
+	}
+	if (alarmStage == 1 && modeCountDown < upTime){
+	  digitalWrite (oAlarmScreech, HIGH);
+	  alarmStage++;
+	}
+	if (upTime > webPollTimeOut){
+	  serBuffer += String(".M4");
+	  webPollTimeOut = upTime + ALARMWEBPOLLINTERVAL;
+	}
+	if (digitalRead(iOffSwitch) || kpGoodPass){
+	  changeMode(5);
+	}
+	break;
   case 5: //stop alarm & blink alarm code
-    digitalWrite(oArmedLed, blinkLeds(100, 1000, 200, sensorTripped));
-    if (modeCountDown < upTime) {
-      changeMode(3);
-    }
-    break;
+	digitalWrite(oArmedLed, blinkLeds(100, 1000, 200, sensorTripped));
+	if (modeCountDown < upTime) {
+	  changeMode(3);
+	}
+	break;
   }
   if (activeTimeOut){
-    if (upTime >= latchTimeOut || (latchTimeOut > 0 && !digitalRead(iDoorSwitch))){
-      digitalWrite(oDoorLatch, LOW);
-      latchTimeOut = 0;
-    }
-    if (upTime >= highIllumLedTimeOut){
-      digitalWrite(oHighIllumLed, LOW);
-      highIllumLedTimeOut = 0;
-    }
-    if (upTime >= codeCheckTimeOut && codeCheckTimeOut > 0){
-      kpDoBadPass();
-      codeCheckTimeOut = 0;
-    }
-      
-    if (latchTimeOut == 0 && highIllumLedTimeOut == 0 && codeCheckTimeOut == 0){
-      activeTimeOut = false;
-    }
+	if (upTime >= latchTimeOut || (latchTimeOut > 0 && !digitalRead(iDoorSwitch))){
+	  digitalWrite(oDoorLatch, LOW);
+	  latchTimeOut = 0;
+	}
+	if (upTime >= highIllumLedTimeOut){
+	  digitalWrite(oHighIllumLed, LOW);
+	  highIllumLedTimeOut = 0;
+	}
+	if (upTime >= codeCheckTimeOut && codeCheckTimeOut > 0){
+	  kpDoBadPass();
+	  codeCheckTimeOut = 0;
+	}
+	  
+	if (latchTimeOut == 0 && highIllumLedTimeOut == 0 && codeCheckTimeOut == 0){
+	  activeTimeOut = false;
+	}
   }
   if (beepActiveType >= 0){
-    if (upTime >= beepTimeOut){
-      if (beepRepeatCount > 0){
-        tone(oBeep, beepTypes[beepActiveType][0], beepTypes[beepActiveType][1]);
-        beepTimeOut = upTime + beepTypes[beepActiveType][2];
-        beepRepeatCount--;
-      }
-      else {
-        beepActiveType = -1;
-      }
-    }
+	if (upTime >= beepTimeOut){
+	  if (beepRepeatCount > 0){
+		tone(oBeep, beepTypes[beepActiveType][0], beepTypes[beepActiveType][1]);
+		beepTimeOut = upTime + beepTypes[beepActiveType][2];
+		beepRepeatCount--;
+	  }
+	  else {
+		beepActiveType = -1;
+	  }
+	}
   }
   if (mode != 4 && webPollTimeOut <upTime){
-    checkSensors(true);
-    webPollTimeOut = upTime + WEBPOLLINTERVAL;
+	checkSensors(true);
+	webPollTimeOut = upTime + WEBPOLLINTERVAL;
   }
   kpGoodPass = false;
   while (Serial.available() > 0) {// pass messages from usb line to rs485 and decide if it's a message the arduino has to do something about
-    // read the incoming byte:
-    incomingByte = Serial.read();
-    if (incomingByte == '.'){
-      serialCharCount = 0;
-      incomingAction = '0';
-      incomingComponentId = '0';
-    }
-    else if (serialCharCount == 1){
-      incomingComponentId = incomingByte;
-    }
-    else if (serialCharCount == 2){
-      incomingAction = incomingByte;
-    }
-    serBuffer1 += incomingByte;
-    serialCharCount++;
+	// read the incoming byte:
+	incomingByte = Serial.read();
+	if (incomingByte == '.'){
+	  serialCharCount = 0;
+	  incomingAction = '0';
+	  incomingComponentId = '0';
+	}
+	else if (serialCharCount == 1){
+	  incomingComponentId = incomingByte;
+	}
+	else if (serialCharCount == 2){
+	  incomingAction = incomingByte;
+	}
+	serBuffer1 += incomingByte;
+	serialCharCount++;
   }
   if (incomingAction != '0'){
-    processCommand();
+	processCommand();
   }
   /*while (Serial1.available() > 0) {// pass on messages from rs485 line to usb; for now arduino module doesn't have to do anything about any of these
-    incomingByte = Serial1.read();
-    serBuffer += incomingByte;
+	incomingByte = Serial1.read();
+	serBuffer += incomingByte;
   }*/
   
   
   if (upTime > serBufferTimeOut){
-    if (serBuffer != String("")){
-      serBuffer += String(".");
-      Serial.print(serBuffer);
-      serBuffer = String("");
-      serBufferTimeOut = upTime + SERBUFFERSENDSPACING;
-    }
-    if (serBuffer1 != String("")){
-      //Serial1.print(serBuffer);
-      serBuffer1 = String("");
-      serBufferTimeOut = upTime + SERBUFFERSENDSPACING;
-    }
+	if (serBuffer != String("")){
+	  serBuffer += String(".");
+	  Serial.print(serBuffer);
+	  serBuffer = String("");
+	  serBufferTimeOut = upTime + SERBUFFERSENDSPACING;
+	}
+	if (serBuffer1 != String("")){
+	  //Serial1.print(serBuffer);
+	  serBuffer1 = String("");
+	  serBufferTimeOut = upTime + SERBUFFERSENDSPACING;
+	}
   } 
 }
 void processCommand(){
   switch (incomingComponentId){
-    case 'D':
-      if (incomingAction == '2'){
-        kpDoGoodPass();
-      }
-      else { 
-        kpDoBadPass();
-      }    
-      codeCheckTimeOut = 0;
-      break;
-    case 'M':
-      changeMode(incomingAction - '0');
-      break;    
-    case 'R':
-      serBuffer = String(".M") + String(mode);
-      checkSensors(true);
-      break;
-    }
-    incomingComponentId = '0';
-    incomingAction = '0';    
+	case 'D':
+	  if (incomingAction == '2'){
+		kpDoGoodPass();
+	  }
+	  else { 
+		kpDoBadPass();
+	  }    
+	  codeCheckTimeOut = 0;
+	  break;
+	case 'M':
+	  changeMode(incomingAction - '0');
+	  break;    
+	case 'R':
+	  serBuffer = String(".M") + String(mode);
+	  checkSensors(true);
+	  break;
+	}
+	incomingComponentId = '0';
+	incomingAction = '0';    
 }
-    
+	
   
   
 
@@ -394,52 +394,52 @@ void kpCheckPassword() {
   int j=0;
   int passcharcount;
   while(j<KPNUMPASSWORDS && !kpGoodPass){
-    passcharcount=0;
-    i=0;
-    while(i <= kpBufferLen) {
-      if (passwords[j][passcharcount] == kpBuffer[i]) {//matched this character, go to next one
-        passcharcount++;
-      }
-      i++;
-    }
-    if (passcharcount==KPPASSWORDLEN){
-      kpGoodPass = true;
-    }
-    j++;
+	passcharcount=0;
+	i=0;
+	while(i <= kpBufferLen) {
+	  if (passwords[j][passcharcount] == kpBuffer[i]) {//matched this character, go to next one
+		passcharcount++;
+	  }
+	  i++;
+	}
+	if (passcharcount==KPPASSWORDLEN){
+	  kpGoodPass = true;
+	}
+	j++;
   }
   if (kpGoodPass){
-    kpDoGoodPass();
+	kpDoGoodPass();
   }
   else if (kpBufferLen > 5){
-    serBuffer += String(".K");
-    kpBufferLen--;
-    for (i=0; i<kpBufferLen; i++){
-      serBuffer += String(kpBuffer[i]);
-    }
-    codeCheckTimeOut = upTime + KPCODECHECKDELAY;
-    activeTimeOut = true;    
-      
+	serBuffer += String(".K");
+	kpBufferLen--;
+	for (i=0; i<kpBufferLen; i++){
+	  serBuffer += String(kpBuffer[i]);
+	}
+	codeCheckTimeOut = upTime + KPCODECHECKDELAY;
+	activeTimeOut = true;    
+	  
   }
   else if (kpBufferLen > 1){ //don't count bad password if only # was pressed
-    kpDoBadPass();  
+	kpDoBadPass();  
   }
 }
 void kpDoGoodPass (){
-    kpFailCount=0;
-    digitalWrite(oDoorLatch, HIGH);
-    activeTimeOut = true;
-    latchTimeOut = upTime + LATCHDELAY;
-    codeCheckTimeOut = 0;
-    doBeep(0);
-    kpGoodPass = true;
+	kpFailCount=0;
+	digitalWrite(oDoorLatch, HIGH);
+	activeTimeOut = true;
+	latchTimeOut = upTime + LATCHDELAY;
+	codeCheckTimeOut = 0;
+	doBeep(0);
+	kpGoodPass = true;
 }
 void kpDoBadPass (){
-    tone(oBeep, 3000, 500);
-    kpFailCount++;
-    kpFailClearTime=upTime + KPMAXTRYTIMEINT;
-    if (kpFailCount > KPMAXTRIES){
-      kpInTimeOut=true;      
-    }
+	tone(oBeep, 3000, 500);
+	kpFailCount++;
+	kpFailClearTime=upTime + KPMAXTRYTIMEINT;
+	if (kpFailCount > KPMAXTRIES){
+	  kpInTimeOut=true;      
+	}
 }
 
 void doBeep(int beepTypeIn){
@@ -450,8 +450,8 @@ void doBeep(int beepTypeIn){
 int changeMode(int modeIn){
   resetBlinkLeds();
   if (mode == 4){
-    noTone(oBeep);
-    beepActiveType = -1;
+	noTone(oBeep);
+	beepActiveType = -1;
   }
   mode = modeIn;
   digitalWrite(oSensorsLed, LOW);
@@ -460,97 +460,99 @@ int changeMode(int modeIn){
   digitalWrite(oIllumLed, HIGH);
   switch (modeIn){
   case 1:
-    digitalWrite(oWaitLed, LOW);   
-    digitalWrite(oNotArmedLed, HIGH);
-    digitalWrite(oArmedLed, LOW);
-    break;
+	digitalWrite(oWaitLed, LOW);   
+	digitalWrite(oNotArmedLed, HIGH);
+	digitalWrite(oArmedLed, LOW);
+	break;
   case 2:
-    digitalWrite(oWaitLed, LOW);    
-    digitalWrite(oNotArmedLed, LOW);
-    digitalWrite(oArmedLed, HIGH);
-    sensorTripped=0;
-    break;
+	digitalWrite(oWaitLed, LOW);    
+	digitalWrite(oNotArmedLed, LOW);
+	digitalWrite(oArmedLed, HIGH);
+	sensorTripped=0;
+	break;
   case 3:
-    digitalWrite(oWaitLed, HIGH);  
-    digitalWrite(oNotArmedLed, LOW);
-    digitalWrite(oArmedLed, LOW);
-    modeCountDown = WAITCOUNTDOWNLENGTH + upTime;
-    break;
+	digitalWrite(oWaitLed, HIGH);  
+	digitalWrite(oNotArmedLed, LOW);
+	digitalWrite(oArmedLed, LOW);
+	modeCountDown = WAITCOUNTDOWNLENGTH + upTime;
+	break;
   case 4:
-    alarmStage = 0;
-    modeCountDown = ALARMSTAGE1LENGTH + upTime;
-    digitalWrite(oWaitLed, LOW);
-    digitalWrite(oNotArmedLed, LOW);
-    digitalWrite(oArmedLed, HIGH);
-    webPollTimeOut = upTime + ALARMWEBPOLLINTERVAL;
-    doBeep(1);
-    break;
+	alarmStage = 0;
+	modeCountDown = ALARMSTAGE1LENGTH + upTime;
+	digitalWrite(oWaitLed, LOW);
+	digitalWrite(oNotArmedLed, LOW);
+	digitalWrite(oArmedLed, HIGH);
+	webPollTimeOut = upTime + ALARMWEBPOLLINTERVAL;
+	doBeep(1);
+	serBuffer += String(".T");
+	serBuffer += String(sensorTripped);
+	break;
   case 5:
-    digitalWrite(oWaitLed, LOW);
-    digitalWrite(oNotArmedLed, LOW);
-    digitalWrite(oArmedLed, LOW);
-    modeCountDown = ALARMCODECOUNTDOWNLENGTH + upTime;
-    break;
+	digitalWrite(oWaitLed, LOW);
+	digitalWrite(oNotArmedLed, LOW);
+	digitalWrite(oArmedLed, LOW);
+	modeCountDown = ALARMCODECOUNTDOWNLENGTH + upTime;
+	break;
   }
   serBuffer += String(".M");
   serBuffer += String(mode);
 
 }
 int checkSensors(byte reportAll){
-    if (!reportAll){
-      sensorTripped = 0;
-    }
-    int thisStatus;
-    for (i = 0; i < NUMALARMSENSEINPUTS; i++){
-      if (!digitalRead(alarmInputs[i][0])){
-        sensorTripped = i + 1;
-        newAlarmTimeOut = upTime + alarmInputs[i][1];
-        if (newAlarmTimeOut < alarmTimeOut || alarmTimeOut == 0){
-          alarmTimeOut = newAlarmTimeOut;
-        }
-        thisStatus = '1';
-      }
-      else {
-        thisStatus = '0';
-      }
-      if (alarmInputSerialCodes[i][1] != thisStatus) {
-        alarmInputSerialCodes[i][1] = thisStatus;
-        reportAll = true;
-      }
-    }
-    if (reportAll){
-     for (i = 0; i < NUMALARMSENSEINPUTS; i++){     
-        serBuffer += String(".");
-        serBuffer += String(alarmInputSerialCodes[i][0]);
-        serBuffer += String(alarmInputSerialCodes[i][1]);
-      }
-    }     
-    if (sensorTripped == 0){
-      alarmTimeOut = 0;
-      return true;
-    }
-    else {
-      return false;
-    }
+	if (!reportAll){
+	  sensorTripped = 0;
+	}
+	int thisStatus;
+	for (i = 0; i < NUMALARMSENSEINPUTS; i++){
+	  if (!digitalRead(alarmInputs[i][0])){
+		sensorTripped = i + 1;
+		newAlarmTimeOut = upTime + alarmInputs[i][1];
+		if (newAlarmTimeOut < alarmTimeOut || alarmTimeOut == 0){
+		  alarmTimeOut = newAlarmTimeOut;
+		}
+		thisStatus = '1';
+	  }
+	  else {
+		thisStatus = '0';
+	  }
+	  if (alarmInputSerialCodes[i][1] != thisStatus) {
+		alarmInputSerialCodes[i][1] = thisStatus;
+		reportAll = true;
+	  }
+	}
+	if (reportAll){
+	 for (i = 0; i < NUMALARMSENSEINPUTS; i++){     
+		serBuffer += String(".");
+		serBuffer += String(alarmInputSerialCodes[i][0]);
+		serBuffer += String(alarmInputSerialCodes[i][1]);
+	  }
+	}     
+	if (sensorTripped == 0){
+	  alarmTimeOut = 0;
+	  return true;
+	}
+	else {
+	  return false;
+	}
 }
 
 int blinkLeds(unsigned long onTime, unsigned long longOffTime, unsigned long shortOffTime, int numBlinks){
   if (ledNextEventTime < upTime) {
-    if (ledBlink) {
-      ledBlink=LOW;
-      ledBlinkCount--;
-      if (ledBlinkCount > 0){
-        ledNextEventTime = upTime + shortOffTime;
-      }
-      else{
-        ledBlinkCount = numBlinks;
-        ledNextEventTime = upTime + longOffTime;
-      }
-    }
-    else{
-      ledBlink = HIGH;
-      ledNextEventTime = upTime + onTime;
-    }
+	if (ledBlink) {
+	  ledBlink=LOW;
+	  ledBlinkCount--;
+	  if (ledBlinkCount > 0){
+		ledNextEventTime = upTime + shortOffTime;
+	  }
+	  else{
+		ledBlinkCount = numBlinks;
+		ledNextEventTime = upTime + longOffTime;
+	  }
+	}
+	else{
+	  ledBlink = HIGH;
+	  ledNextEventTime = upTime + onTime;
+	}
   }
   return ledBlink;
 }
