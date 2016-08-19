@@ -175,10 +175,10 @@ while True:
 	if smsTime:
 		if now > smsTime:
 			if systemStatus['T']:
-				sensorName = 'by ' + systemStatus['T']
+				sensorName = ' by ' + alarmTriggerNames[systemStatus['T']]
 			else:
 				sensorName = ''
-			alarmMessage = 'Boxahop alarm triggered{} at {%b %d %H:%M}'.format(sensorName, timeAlarmTriggered)
+			alarmMessage = 'Boxahop alarm triggered{} on {:%b %d, %H:%M}'.format(sensorName, timeAlarmTriggered)
 			for name, phoneNumber in config['phoneNumbers'].items():
 				print 'Texting' + name
 				message = twilioClient.messages.create(to=phoneNumber, from_=config['fromNumber'], body=alarmMessage)
