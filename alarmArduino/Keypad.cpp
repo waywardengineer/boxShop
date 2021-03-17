@@ -44,7 +44,7 @@ Keypad::Keypad(char *userKeymap, byte *row, byte *col, byte rows, byte cols)
     begin(userKeymap);
 	
 	lastUpdate = 0;
-	debounceTime = 200;
+	debounceTime = 350;
 	holdTime = 1000;
 	keypadEventListener = 0;
 	currentKey = NO_KEY;

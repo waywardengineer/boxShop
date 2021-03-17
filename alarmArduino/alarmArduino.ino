@@ -137,7 +137,7 @@ unsigned long deBounceTimeOut[NUMDEBOUNCEDINPUTS];
 int incomingByte;
 
 void setup() {
-  Serial.begin(9600);
+  //Serial.begin(9600);
   //Serial1.begin(9600);
   pinMode (oAlarmBell,OUTPUT);
   pinMode (oAlarmScreech,OUTPUT);
@@ -190,8 +190,7 @@ void loop() {
     activeTimeOut = true;
     if (kpLastKey != key) {
       kpLastKeyTime = upTime;
-      if (!kpInTimeOut){
-        
+      if (!kpInTimeOut){      
         if (kpBufferLen <= sizeof(kpBuffer) - 1){
           kpBuffer[kpBufferLen++] = key;
           tone(oBeep, 3000, 50);
@@ -318,7 +317,7 @@ void loop() {
     webPollTimeOut = upTime + WEBPOLLINTERVAL;
   }
   kpGoodPass = false;
-  while (Serial.available() > 0) {// pass messages from usb line to rs485 and decide if it's a message the arduino has to do something about
+  /*while (Serial.available() > 0) {// pass messages from usb line to rs485 and decide if it's a message the arduino has to do something about
     // read the incoming byte:
     incomingByte = Serial.read();
     if (incomingByte == '.'){
@@ -337,14 +336,14 @@ void loop() {
   }
   if (incomingAction != '0'){
     processCommand();
-  }
+  }*/
   /*while (Serial1.available() > 0) {// pass on messages from rs485 line to usb; for now arduino module doesn't have to do anything about any of these
     incomingByte = Serial1.read();
     serBuffer += incomingByte;
   }*/
   
   
-  if (upTime > serBufferTimeOut){
+  /*if (upTime > serBufferTimeOut){
     if (serBuffer != String("")){
       serBuffer += String(".");
       Serial.print(serBuffer);
@@ -356,7 +355,7 @@ void loop() {
       serBuffer1 = String("");
       serBufferTimeOut = upTime + SERBUFFERSENDSPACING;
     }
-  } 
+  } */
 }
 void processCommand(){
   switch (incomingComponentId){
@@ -410,7 +409,7 @@ void kpCheckPassword() {
   if (kpGoodPass){
     kpDoGoodPass();
   }
-  else if (kpBufferLen > 5){
+  /*else if (kpBufferLen > 5){
     serBuffer += String(".K");
     kpBufferLen--;
     for (i=0; i<kpBufferLen; i++){
@@ -419,7 +418,7 @@ void kpCheckPassword() {
     codeCheckTimeOut = upTime + KPCODECHECKDELAY;
     activeTimeOut = true;    
       
-  }
+  }*/
   else if (kpBufferLen > 1){ //don't count bad password if only # was pressed
     kpDoBadPass();  
   }
@@ -575,5 +574,3 @@ void doWrap(){
   beepActiveType = -1;
   digitalWrite(oDoorLatch, LOW);
 }
-
-
